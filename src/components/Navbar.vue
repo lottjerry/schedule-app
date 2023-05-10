@@ -1,7 +1,8 @@
 <template>
 	<nav>
-		<v-app-bar>
+		<v-toolbar app>
 			<v-app-bar-title>Schedule App</v-app-bar-title>
+				<v-btn to="/"> Login </v-btn>
 			<!-- dropdown menu -->
 			<v-menu location="bottom">
 				<template v-slot:activator="{ props }">
@@ -14,18 +15,15 @@
 					</v-list-item>
 				</v-list>
 			</v-menu>
-		</v-app-bar>
+		</v-toolbar>
+		<router-view></router-view>
 	</nav>
 </template>
 
 <script>
 export default {
 	data: () => ({
-		items: [
-			{ title: 'Schedules' },
-			{ title: 'Profile' },
-			{ title: 'Log out' },
-		],
+		items: [{ title: 'Schedules' }, { title: 'Profile' }, { title: 'Log out' }],
 	}),
 };
 </script>
