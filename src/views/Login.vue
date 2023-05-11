@@ -5,7 +5,7 @@
 	</div>
 	<div class="d-flex align-center justify-center">
 		<v-card width="400">
-			<v-form fast-fail class="pa-5 flex">
+			<v-form fast-fail class="pa-5 flex" @submit.prevent="login">
 				<v-text-field
 					color="primary"
 					variant="underlined"
@@ -24,7 +24,7 @@
 				></v-text-field>
 				<p v-if="errMsg" class="mb-4 text-red" >{{ errMsg }}</p>
 				<a href="#" class="text-body-2 font-weight-regular">Forgot Password?</a>
-				<v-btn @click="login" color="primary" block class="mt-2">Log in</v-btn>
+				<v-btn type="submit" color="primary" block class="mt-2">Log in</v-btn>
 			</v-form>
 			<div class="mt-2">
 				<p class="text-body-2 pa-5">

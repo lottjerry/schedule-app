@@ -1,6 +1,6 @@
-import { createRouter, createWebHistory } from "vue-router";
-import Login from '@/views/Login'
-import Schedules from '@/views/Schedules'
+import { createRouter, createWebHistory } from 'vue-router';
+import Login from '@/views/Login';
+import Schedules from '@/views/Schedules';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 
 const routes = [
@@ -14,15 +14,14 @@ const routes = [
 		name: 'schedules',
 		component: Schedules,
 		meta: {
-			requiresAuth: true
-		}
+			requiresAuth: true,
+		},
 	},
-
 ];
 
 const router = createRouter({
-  history: createWebHistory(process.env.BASE_URL),
-  routes,
+	history: createWebHistory(process.env.BASE_URL),
+	routes,
 });
 
 const getCurrentUser = () => {
@@ -34,20 +33,27 @@ const getCurrentUser = () => {
 				resolve(user);
 			},
 			reject
-		)
-	})
-}
+		);
+	});
+};
 
 router.beforeEach(async (to, from, next) => {
-	if (to.matched.some((record) => record.meta.requiresAuth)) {
-		if(await getCurrentUser) {
-			next();
-		} else {
-			next('/')
-		}
+if (to.name === 'login') {
+	if (await getCurrentUser()) {
+		next('/schedules');
 	} else {
-		next()
+		next();
 	}
-})
+} else if (to.matched.some((record) => record.meta.requiresAuth)) {
+	if (await getCurrentUser()) {
+		next();
+	} else {
+		next('/');
+	}
+} else {
+	next();
+}
+});
+
 
 export default router;
