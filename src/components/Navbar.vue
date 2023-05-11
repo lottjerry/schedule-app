@@ -2,7 +2,7 @@
 	<nav>
 		<v-toolbar app>
 			<v-app-bar-title>Schedule App</v-app-bar-title>
-				<v-btn to="/"> Login </v-btn>
+			<v-btn to="/"> Login </v-btn>
 			<!-- dropdown menu -->
 			<v-menu location="bottom">
 				<template v-slot:activator="{ props }">
@@ -10,7 +10,7 @@
 				</template>
 
 				<v-list>
-					<v-list-item v-for="(item, i) in items" :key="i">
+					<v-list-item v-for="(item, i) in items" :key="i" :to="item.route">
 						<v-list-item-title>{{ item.title }}</v-list-item-title>
 					</v-list-item>
 				</v-list>
@@ -23,7 +23,11 @@
 <script>
 export default {
 	data: () => ({
-		items: [{ title: 'Schedules' }, { title: 'Profile' }, { title: 'Log out' }],
+		items: [
+			{ title: 'Schedules', route: '/schedule' },
+			{ title: 'Profile', route: '/profile' },
+			{ title: 'Log out' },
+		],
 	}),
 };
 </script>
