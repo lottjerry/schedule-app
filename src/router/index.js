@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
 import Login from '@/views/Login'
-import Schedule from '@/views/Schedule'
+import Schedules from '@/views/Schedules'
 
 const routes = [
 	{
@@ -9,9 +9,9 @@ const routes = [
 		component: Login,
 	},
 	{
-		path: '/schedule',
-		name: 'schedule',
-		component: Schedule,
+		path: '/schedules',
+		name: 'schedules',
+		component: Schedules,
 	},
 
 ];
