@@ -1,7 +1,7 @@
 <template>
 	<div class="d-flex flex-column align-center justify-center mt-5">
-		<v-icon icon="mdi-home" size="x-large" color="primary"></v-icon>
-		<h1 class="text-primary">Log in</h1>
+		<v-icon icon="mdi-home-outline" size="40" color="primary"></v-icon>
+		<h1 class="text-primary text-h4 font-weight-bold pa-2">Log in</h1>
 	</div>
 	<div class="d-flex align-center justify-center">
 		<v-card width="400">

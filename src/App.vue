@@ -1,13 +1,6 @@
 <template>
 	<v-app>
 		<Navbar />
-		<!--
-		<v-toolbar color="#616161" class="">
-			<v-btn to="/"> Home </v-btn>
-			<v-btn to="/about"> About </v-btn>
-		</v-toolbar>
-		<router-view></router-view>
-		-->
 	</v-app>
 </template>
 

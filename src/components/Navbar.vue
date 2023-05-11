@@ -25,7 +25,6 @@ export default {
 	data: () => ({
 		items: [
 			{ title: 'Schedules', route: '/schedule' },
-			{ title: 'Profile', route: '/profile' },
 			{ title: 'Log out' },
 		],
 	}),
