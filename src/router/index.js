@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import Login from '@/views/Login';
-import Schedules from '@/views/Schedules';
+import Home from '@/views/Home';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 
 const routes = [
@@ -10,9 +10,9 @@ const routes = [
 		component: Login,
 	},
 	{
-		path: '/schedules',
-		name: 'schedules',
-		component: Schedules,
+		path: '/home',
+		name: 'home',
+		component: Home,
 		meta: {
 			requiresAuth: true,
 		},
@@ -40,7 +40,7 @@ const getCurrentUser = () => {
 router.beforeEach(async (to, from, next) => {
 if (to.name === 'login') {
 	if (await getCurrentUser()) {
-		next('/schedules');
+		next('/home');
 	} else {
 		next();
 	}

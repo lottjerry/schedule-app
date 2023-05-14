@@ -52,7 +52,7 @@ export default {
 			const auth = getAuth();
 			signInWithEmailAndPassword(auth, email.value, password.value)
 				.then(() => {
-					router.push('/schedules');
+					router.push('/home');
 				})
 				.catch((error) => {
 					switch (error.code) {

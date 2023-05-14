@@ -1,6 +1,6 @@
 <template>
   <div>
-    <p>Schedule page</p>
+    <p class="text-primary">Home Page</p>
   </div>
 </template>
 

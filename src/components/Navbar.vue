@@ -9,9 +9,11 @@
 					<v-btn variant="tonal" v-bind="props">{{ user_name }}</v-btn>
 				</template>
 				<v-list>
+					<!--
 					<v-list-item to="/schedules">
 						<v-list-item-title>Schedules</v-list-item-title>
 					</v-list-item>
+					-->
 					<v-list-item @click="logout">
 						<v-list-item-title>Log out</v-list-item-title>
 					</v-list-item>
