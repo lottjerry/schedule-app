@@ -9,11 +9,17 @@
 					<v-btn variant="tonal" v-bind="props">{{ user_name }}</v-btn>
 				</template>
 				<v-list>
-					<!--
-					<v-list-item to="/schedules">
-						<v-list-item-title>Schedules</v-list-item-title>
-					</v-list-item>
-					-->
+					<div v-if="user_role === 'admin'">
+						<v-list-item to="/home">
+							<v-list-item-title>Home</v-list-item-title>
+						</v-list-item>
+						<v-list-item to="/users">
+							<v-list-item-title>Users</v-list-item-title>
+						</v-list-item>
+						<v-list-item to="/schedules">
+							<v-list-item-title>Schedules</v-list-item-title>
+						</v-list-item>
+					</div>
 					<v-list-item @click="logout">
 						<v-list-item-title>Log out</v-list-item-title>
 					</v-list-item>
@@ -35,11 +41,12 @@ export default {
 	setup() {
 		const user_email = ref(null);
 		const user_name = ref(null);
+		const user_role = ref(null);
 		const isLoggedIn = ref(false);
 		const router = useRouter();
 
 		// Get Firestore instance
-    const db = getFirestore(app);
+		const db = getFirestore(app);
 
 		let auth;
 		onMounted(() => {
@@ -52,12 +59,14 @@ export default {
 					getDoc(userDocRef).then((doc) => {
 						if (doc.exists()) {
 							user_name.value = doc.data().name;
+							user_role.value = doc.data().role;
 						}
 					});
 				} else {
 					isLoggedIn.value = false;
 					user_email.value = null;
 					user_name.value = null;
+					user_role.value = null;
 				}
 			});
 		});
@@ -74,6 +83,7 @@ export default {
 		return {
 			user_email,
 			user_name,
+			user_role,
 			isLoggedIn,
 			logout,
 		};

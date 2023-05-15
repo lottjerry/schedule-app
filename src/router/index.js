@@ -1,6 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import Login from '@/views/Login';
 import Home from '@/views/Home';
+import Users from '@/views/Users'
+import Schedules from '@/views/Schedules';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 
 const routes = [
@@ -13,6 +15,22 @@ const routes = [
 		path: '/home',
 		name: 'home',
 		component: Home,
+		meta: {
+			requiresAuth: true,
+		},
+	},
+	{
+		path: '/users',
+		name: 'users',
+		component: Users,
+		meta: {
+			requiresAuth: true,
+		},
+	},
+	{
+		path: '/schedules',
+		name: 'schedules',
+		component: Schedules,
 		meta: {
 			requiresAuth: true,
 		},
