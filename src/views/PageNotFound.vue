@@ -1,11 +1,23 @@
 <template>
 	<div>
-		<div v-if="isLoggedIn">
-			<v-btn color="success" to="/home">Back to Home</v-btn>
-		</div>
-		<div v-else>
-			<v-btn color="success" to="/">Back to Login</v-btn>
-		</div>
+		<v-container class="text-center" v-if="isLoggedIn">
+			<v-card class="pa-3">
+				<v-img src="https://i.gifer.com/XOsX.gif" max-height="500"></v-img>
+				<v-card-text class="subtitle-1"
+					>Oops! This page isn't available.</v-card-text
+				>
+				<v-btn color="primary" dark to="/home" class="ma-3">Go Back to Home</v-btn>
+			</v-card>
+		</v-container>
+    <v-container class="text-center" v-else>
+			<v-card class="pa-3">
+				<v-img src="https://i.gifer.com/XOsX.gif" max-height="500"></v-img>
+				<v-card-text class="text-h5 text-xs-h5 ma-3"
+					>Oops! This page isn't available.</v-card-text
+				>
+				<v-btn color="primary" dark to="/" class="ma-6">Go Back to Home</v-btn>
+			</v-card>
+		</v-container>
 		<router-view></router-view>
 	</div>
 </template>
