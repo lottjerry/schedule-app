@@ -1,9 +1,11 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import Login from '@/views/Login';
 import Home from '@/views/Home';
-import Users from '@/views/Users'
+import Users from '@/views/Users';
 import Schedules from '@/views/Schedules';
+import PageNotFound from '@/views/PageNotFound';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import { getFirestore, doc, getDoc } from 'firebase/firestore';
 
 const routes = [
 	{
@@ -11,6 +13,7 @@ const routes = [
 		name: 'login',
 		component: Login,
 	},
+
 	{
 		path: '/home',
 		name: 'home',
@@ -25,6 +28,7 @@ const routes = [
 		component: Users,
 		meta: {
 			requiresAuth: true,
+			requiresAdmin: true,
 		},
 	},
 	{
@@ -33,7 +37,13 @@ const routes = [
 		component: Schedules,
 		meta: {
 			requiresAuth: true,
+			requiresAdmin: true,
 		},
+	},
+	{
+		path: '/:pathMatch(.*)*',
+		name: 'pagenotfound',
+		component: PageNotFound,
 	},
 ];
 
@@ -55,23 +65,57 @@ const getCurrentUser = () => {
 	});
 };
 
-router.beforeEach(async (to, from, next) => {
-if (to.name === 'login') {
-	if (await getCurrentUser()) {
-		next('/home');
+async function getUserRole(userId) {
+	const db = getFirestore();
+	const userRef = doc(db, 'users', userId);
+	const userDoc = await getDoc(userRef);
+	if (userDoc.exists()) {
+		return userDoc.data().role;
 	} else {
-		next();
+		throw new Error('User not found');
 	}
-} else if (to.matched.some((record) => record.meta.requiresAuth)) {
-	if (await getCurrentUser()) {
-		next();
-	} else {
-		next('/');
-	}
-} else {
-	next();
 }
+
+router.beforeEach(async (to, from, next) => {
+	if (to.name === 'login') {
+		if (await getCurrentUser()) {
+			next('/home');
+		} else {
+			next();
+		}
+	} else if (to.matched.some((record) => record.meta.requiresAdmin)) {
+		const currentUser = await getCurrentUser();
+		if (currentUser) {
+			const userRole = await getUserRole(currentUser.uid);
+			if (userRole === 'admin') {
+				next();
+			} else {
+				next('/home');
+			}
+		} else {
+			next('/');
+		}
+	} else {
+		next();
+	}
 });
 
+router.beforeEach(async (to, from, next) => {
+	if (to.name === 'login') {
+		if (await getCurrentUser()) {
+			next('/home');
+		} else {
+			next();
+		}
+	} else if (to.matched.some((record) => record.meta.requiresAuth)) {
+		if (await getCurrentUser()) {
+			next();
+		} else {
+			next('/');
+		}
+	} else {
+		next();
+	}
+});
 
 export default router;
