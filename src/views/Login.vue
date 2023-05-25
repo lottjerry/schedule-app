@@ -88,4 +88,7 @@ export default {
 .v-input:focus-within .mdi-email-outline {
 	color: red;
 }
+.v-input:focus-within .mdi-account-outline {
+	color: red;
+}
 </style>
