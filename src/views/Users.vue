@@ -1,14 +1,16 @@
 <template>
 	<div>
-		<div class="d-flex justify-center">
+		<div class="d-flex justify-center mt-10">
 			<v-btn>
 				New User
 				<v-overlay
 					activator="parent"
 					location-strategy="connected"
 					scroll-strategy="block"
+					location="top center"
+					origin="auto"
 				>
-					<div class="d-flex align-center justify-center">
+					<div>
 						<v-card width="400">
 							<div class="pa-5 flex">
 								<v-text-field
@@ -78,6 +80,7 @@ const createUser = () => {
 			alert(`Error creating user: ${error.message}`);
 		});
 };
+
 </script>
 
 <style lang="scss" scoped></style>
