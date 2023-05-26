@@ -6,9 +6,9 @@
 			<!-- dropdown menu -->
 			<v-menu location="bottom" v-if="isLoggedIn">
 				<template v-slot:activator="{ props }">
-					<v-btn variant="tonal" v-bind="props">{{ user_name }}</v-btn>
+					<v-btn variant="tonal" v-bind="props" color="primary">{{ user_name }}</v-btn>
 				</template>
-				<v-list>
+				<v-list color="primary">
 					<div v-if="user_role === 'admin'">
 						<v-list-item to="/home">
 							<v-list-item-title>Home</v-list-item-title>
