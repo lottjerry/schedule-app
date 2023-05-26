@@ -17,12 +17,14 @@
 						label="Name"
 						prepend-icon="mdi-account-outline"
 						variant="underlined"
+            color="primary"
 					></v-text-field>
 					<v-text-field
 						v-model="email"
 						label="Email"
 						prepend-icon="mdi-email-outline"
 						variant="underlined"
+            color="primary"
 					></v-text-field>
 					<v-text-field
 						v-model="password"
@@ -30,6 +32,7 @@
 						type="password"
 						prepend-icon="mdi-lock-outline"
 						variant="underlined"
+            color="primary"
 					></v-text-field>
 					<p v-if="errMsg" class="mb-4 text-red">{{ errMsg }}</p>
 				</v-card-text>
