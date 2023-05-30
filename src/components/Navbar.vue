@@ -6,7 +6,7 @@
 			<!-- dropdown menu -->
 			<v-menu location="bottom" v-if="isLoggedIn">
 				<template v-slot:activator="{ props }">
-					<v-btn variant="tonal" v-bind="props" color="primary">{{ user_name }}</v-btn>
+					<v-btn variant="tonal" v-bind="props" color="primary">{{ user_firstName }}</v-btn>
 				</template>
 				<v-list color="primary">
 					<div v-if="user_role === 'admin'">
@@ -40,7 +40,7 @@ import { getFirestore, doc, getDoc } from 'firebase/firestore';
 export default {
 	setup() {
 		const user_email = ref(null);
-		const user_name = ref(null);
+		const user_firstName = ref(null);
 		const user_role = ref(null);
 		const isLoggedIn = ref(false);
 		const router = useRouter();
@@ -58,14 +58,14 @@ export default {
 					const userDocRef = doc(db, 'users', user.uid);
 					getDoc(userDocRef).then((doc) => {
 						if (doc.exists()) {
-							user_name.value = doc.data().name;
+							user_firstName.value = doc.data().firstName;
 							user_role.value = doc.data().role;
 						}
 					});
 				} else {
 					isLoggedIn.value = false;
 					user_email.value = null;
-					user_name.value = null;
+					user_firstName.value = null;
 					user_role.value = null;
 				}
 			});
@@ -82,7 +82,7 @@ export default {
 
 		return {
 			user_email,
-			user_name,
+			user_firstName,
 			user_role,
 			isLoggedIn,
 			logout,
