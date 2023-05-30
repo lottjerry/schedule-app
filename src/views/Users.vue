@@ -78,7 +78,7 @@
 				<thead>
 					<tr>
 						<th class="text-left">First Name</th>
-            <th class="text-left">Last Name</th>
+						<th class="text-left">Last Name</th>
 						<th class="text-left">Position</th>
 						<th class="text-left">Role</th>
 						<th class="text-left"></th>
@@ -88,9 +88,9 @@
 				</thead>
 				<tbody>
 					<tr v-for="user in users" :key="user.id">
-						<td>{{ user.firstName}}</td>
-            <td>{{ user.lastName}}</td>
-            <td>{{ user.position}}</td>
+						<td>{{ user.firstName }}</td>
+						<td>{{ user.lastName }}</td>
+						<td>{{ user.position }}</td>
 						<td>{{ user.role }}</td>
 						<td>
 							<v-btn @click="deleteUser(user)" color="error">Delete</v-btn>
@@ -99,6 +99,12 @@
 							<v-btn @click="editUser(user)" color="primary">Edit</v-btn>
 							<!-- Edit button -->
 						</td>
+						<td>
+							<v-btn @click="resetPassword(user)" color="purple"
+								>Reset Password</v-btn
+							>
+						</td>
+						<!-- Password Reset Button -->
 					</tr>
 				</tbody>
 			</v-table>
@@ -118,7 +124,7 @@
 						variant="underlined"
 						color="primary"
 					></v-text-field>
-          <v-text-field
+					<v-text-field
 						v-model="editLastName"
 						label="Last Name"
 						prepend-icon="mdi-account-outline"
@@ -164,7 +170,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
+import { getAuth, createUserWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth';
 import {
 	getFirestore,
 	doc,
@@ -304,6 +310,20 @@ const cancelEditUserDialog = () => {
 	editEmail.value = '';
 	editUserDialog.value = false;
 };
+
+// Reset Password
+	const resetPassword = (user) => {
+		const auth = getAuth();
+		const email = user.email;
+
+		sendPasswordResetEmail(auth, email)
+			.then(() => {
+				alert(`Reset password email sent to ${email}`);
+			})
+			.catch((error) => {
+				errMsg.value = `Error resetting password: ${error.message}`;
+			});
+	};
 
 // Fetch users on component mount
 onMounted(fetchUsers);
