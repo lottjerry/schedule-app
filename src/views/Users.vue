@@ -110,6 +110,45 @@
 			</v-table>
 		</v-card>
 
+		<!-- Users Cards -->
+		<v-card width="350px" class="mx-auto">
+			<v-col v-for="user in users" :key="user.id">
+				<v-card class="pa-8">
+					<v-card-title class="text-center">{{ user.firstName }} {{ user.lastName }}</v-card-title>
+					<v-card-text class="text-center">
+						<div>Position: {{ user.position }}</div>
+						<div>Role: {{ user.role }}</div>
+					</v-card-text>
+					<v-card-actions class="justify-center">
+						<v-btn
+							@click="deleteUser(user)"
+							color="error"
+							variant="outlined"
+							elevation="1"
+							size="small"
+							>Delete</v-btn
+						>
+						<v-btn
+							@click="editUser(user)"
+							color="primary"
+							variant="outlined"
+							elevation="1"
+							size="small"
+							>Edit</v-btn
+						>
+						<v-btn
+							@click="resetPassword(user)"
+							color="purple"
+							variant="outlined"
+							elevation="1"
+							size="small"
+							>Reset Password</v-btn
+						>
+					</v-card-actions>
+				</v-card>
+			</v-col>
+		</v-card>
+
 		<!-- Edit User Dialog -->
 		<v-dialog v-model="editUserDialog" max-width="400px">
 			<v-card>
@@ -170,7 +209,11 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import { getAuth, createUserWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth';
+import {
+	getAuth,
+	createUserWithEmailAndPassword,
+	sendPasswordResetEmail,
+} from 'firebase/auth';
 import {
 	getFirestore,
 	doc,
@@ -312,18 +355,18 @@ const cancelEditUserDialog = () => {
 };
 
 // Reset Password
-	const resetPassword = (user) => {
-		const auth = getAuth();
-		const email = user.email;
+const resetPassword = (user) => {
+	const auth = getAuth();
+	const email = user.email;
 
-		sendPasswordResetEmail(auth, email)
-			.then(() => {
-				alert(`Reset password email sent to ${email}`);
-			})
-			.catch((error) => {
-				errMsg.value = `Error resetting password: ${error.message}`;
-			});
-	};
+	sendPasswordResetEmail(auth, email)
+		.then(() => {
+			alert(`Reset password email sent to ${email}`);
+		})
+		.catch((error) => {
+			errMsg.value = `Error resetting password: ${error.message}`;
+		});
+};
 
 // Fetch users on component mount
 onMounted(fetchUsers);
