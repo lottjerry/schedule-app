@@ -70,7 +70,7 @@
 		</v-dialog>
 
 		<!-- Users Table -->
-		<v-card class="mx-auto pa-5 mt-5 back" style="width: 1000px">
+		<v-card class="mx-auto pa-5 mt-5 hidden-sm-and-down" style="width: 1000px">
 			<v-card-title primary-title class="text-center" style="color: blue">
 				Users
 			</v-card-title>
@@ -111,7 +111,7 @@
 		</v-card>
 
 		<!-- Users Cards -->
-		<v-card width="350px" class="mx-auto">
+		<v-card width="350px" class="mx-auto hidden-md-and-up mt-5">
 			<v-col v-for="user in users" :key="user.id">
 				<v-card class="pa-8">
 					<v-card-title class="text-center">{{ user.firstName }} {{ user.lastName }}</v-card-title>
