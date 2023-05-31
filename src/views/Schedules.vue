@@ -61,6 +61,7 @@
 import { ref, watch } from 'vue';
 import Datepicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css';
+import { collection, addDoc, getFirestore } from 'firebase/firestore';
 
 const newScheduleDialog = ref(false);
 const image = ref('');
@@ -68,6 +69,7 @@ const errMsg = ref('');
 const date = ref('');
 const startDate = ref('');
 const endDate = ref('');
+const db = getFirestore();
 
 // Show New Schedule Dialog
 const showNewScheduleDialog = () => {
@@ -78,15 +80,18 @@ const showNewScheduleDialog = () => {
 const cancelNewScheduleDialog = () => {
 	newScheduleDialog.value = false;
 	image.value = '';
-	startDate.value = ''
-	endDate.value = ''
+	startDate.value = '';
+	endDate.value = '';
 };
 
 // Create Schedule
 const createSchedule = () => {
-	// Perform schedule creation logic here
+	const docRef = addDoc(collection(db, 'schedules'), {
+		startDate: startDate.value,
+		endDate: endDate.value, 
+	});
+	alert('Document written with ID: ', docRef.id);
 };
-
 // Watch for changes in the date and update the formatted date
 watch(date, (newDate) => {
 	startDate.value = formatDate(newDate[0]);
