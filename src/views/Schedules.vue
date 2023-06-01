@@ -59,6 +59,7 @@
 
 <script setup>
 import { ref, watch } from 'vue';
+import { getStorage, ref as storageRef, uploadBytes, updateMetadata } from "firebase/storage";
 import Datepicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css';
 import { collection, addDoc, getFirestore } from 'firebase/firestore';
@@ -70,42 +71,65 @@ const date = ref('');
 const startDate = ref('');
 const endDate = ref('');
 const db = getFirestore();
+const storage = getStorage();
+const imageRef = ref(storageRef(storage, 'images'));
 
 // Show New Schedule Dialog
 const showNewScheduleDialog = () => {
-	newScheduleDialog.value = true;
+  newScheduleDialog.value = true;
 };
 
 // Cancel New Schedule Dialog
 const cancelNewScheduleDialog = () => {
-	newScheduleDialog.value = false;
-	image.value = '';
-	startDate.value = '';
-	endDate.value = '';
+  newScheduleDialog.value = false;
+  image.value = '';
+  startDate.value = '';
+  endDate.value = '';
 };
 
 // Create Schedule
-const createSchedule = () => {
-	const docRef = addDoc(collection(db, 'schedules'), {
-		startDate: startDate.value,
-		endDate: endDate.value, 
-	});
-	alert('Document written with ID: ', docRef.id);
+const createSchedule = async () => {
+  const docRef = await addDoc(collection(db, 'schedules'), {
+    startDate: startDate.value,
+    endDate: endDate.value,
+  });
+
+ if (image.value) {
+    const file = image.value[0];
+    const imageName = file.name;
+    const imageStorageRef = storageRef(imageRef.value, imageName);
+    await uploadBytes(imageStorageRef, file);
+
+    // Set image metadata with start date and end date
+    const metadata = {
+      customMetadata: {
+        startDate: startDate.value,
+        endDate: endDate.value,
+      },
+    };
+    await updateMetadata(imageStorageRef, metadata);
+
+    alert('File Successfully Uploaded!');
+  }
+
+  alert('Document written with ID: ' + docRef.id);
 };
+
 // Watch for changes in the date and update the formatted date
 watch(date, (newDate) => {
-	startDate.value = formatDate(newDate[0]);
-	endDate.value = formatDate(newDate[1]);
+  startDate.value = formatDate(newDate[0]);
+  endDate.value = formatDate(newDate[1]);
 });
 
 // Format the date to show only the month, day, and year
 const formatDate = (date) => {
-	return date.toLocaleDateString(undefined, {
-		year: 'numeric',
-		month: 'long',
-		day: 'numeric',
-	});
+  return date.toLocaleDateString(undefined, {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
 };
 </script>
+
 
 <style></style>
