@@ -144,7 +144,7 @@ const createSchedule = async () => {
 
   alert('Document written with ID: ' + docRef.id);
 
-  newScheduleDialog.value = false;
+  cancelNewScheduleDialog()
 };
 
 
@@ -166,6 +166,11 @@ const formatDate = (date) => {
 // Fetch schedules and image URLs on component mount
 onMounted(() => {
 	fetchSchedules();
+});
+
+// Watch for changes in the schedules array and fetch schedules
+watch(schedules, () => {
+  fetchSchedules();
 });
 
 const fetchSchedules = () => {
