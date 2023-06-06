@@ -54,16 +54,17 @@
 				</v-card-actions>
 			</v-card>
 		</v-dialog>
+
 		<!-- Schedule List -->
-		<div v-if="schedules.length">
+		<div>
 			<h2>Schedules</h2>
 			<ul>
-				<li v-for="schedule in schedules" :key="schedule.endDate">
+				<li v-for="(schedule, index) in schedules" :key="schedule.endDate">
 					<h3>{{ schedule.startDate }} - {{ schedule.endDate }}</h3>
 					<img
-						height="200px"
-						:src="getImageUrl(schedule.endDate)"
-						:alt="schedule.endDate"
+						:src="imageURLs[index]"
+						alt="Schedule Image"
+						style="height: 20vh"
 					/>
 				</li>
 			</ul>
@@ -72,24 +73,24 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue';
+import { ref, watch, onMounted } from 'vue';
 import {
 	getStorage,
 	ref as storageRef,
-	uploadBytes,
-	updateMetadata,
 	getDownloadURL,
+	updateMetadata,
+	uploadBytes,
 } from 'firebase/storage';
-import Datepicker from '@vuepic/vue-datepicker';
-import '@vuepic/vue-datepicker/dist/main.css';
 import {
 	collection,
-	addDoc,
 	getFirestore,
-	onSnapshot,
 	query,
 	orderBy,
+	onSnapshot,
+	addDoc,
 } from 'firebase/firestore';
+import Datepicker from '@vuepic/vue-datepicker';
+import '@vuepic/vue-datepicker/dist/main.css';
 
 const newScheduleDialog = ref(false);
 const image = ref('');
@@ -101,7 +102,7 @@ const db = getFirestore();
 const storage = getStorage();
 const imageRef = ref(storageRef(storage, 'images'));
 const schedules = ref([]);
-
+const imageURLs = ref([]);
 
 // Show New Schedule Dialog
 const showNewScheduleDialog = () => {
@@ -116,42 +117,42 @@ const cancelNewScheduleDialog = () => {
 	endDate.value = '';
 };
 
+// Create Schedule
 const createSchedule = async () => {
-	const docRef = await addDoc(collection(db, 'schedules'), {
-		startDate: startDate.value,
-		endDate: endDate.value,
-	});
+  const docRef = await addDoc(collection(db, 'schedules'), {
+    startDate: startDate.value,
+    endDate: endDate.value,
+  });
 
-	if (image.value) {
-		const file = image.value[0];
-		const imageName = `${endDate.value}.jpg`;
-		const imageStorageRef = storageRef(imageRef.value, imageName);
-		await uploadBytes(imageStorageRef, file);
+  if (image.value) {
+    const file = image.value[0];
+    const imageName = `${endDate.value}.jpg`;
+    const imageStorageRef = storageRef(imageRef.value, imageName);
+    await uploadBytes(imageStorageRef, file);
 
-		// Set image metadata with start date and end date
-		const metadata = {
-			customMetadata: {
-				startDate: startDate.value,
-				endDate: endDate.value,
-			},
-		};
-		await updateMetadata(imageStorageRef, metadata);
+    // Set image metadata with start date and end date
+    const metadata = {
+      customMetadata: {
+        startDate: startDate.value,
+        endDate: endDate.value,
+      },
+    };
+    await updateMetadata(imageStorageRef, metadata);
 
-		alert('File Successfully Uploaded!');
-	}
+    alert('File Successfully Uploaded!');
+  }
 
-	alert('Document written with ID: ' + docRef.id);
+  alert('Document written with ID: ' + docRef.id);
 
-	newScheduleDialog.value = false;
+  newScheduleDialog.value = false;
 };
+
 
 // Watch for changes in the date and update the formatted date
 watch(date, (newDate) => {
 	startDate.value = formatDate(newDate[0]);
 	endDate.value = formatDate(newDate[1]);
 });
-
-
 
 // Format the date to show only the month, day, and year
 const formatDate = (date) => {
@@ -161,23 +162,39 @@ const formatDate = (date) => {
 		day: 'numeric',
 	});
 };
-const getImageUrl = async (endDate) => {
-	const imageStorageRef = storageRef(storage, `images/${endDate}.jpg`);
-	const downloadURL = await getDownloadURL(imageStorageRef);
-	console.log(downloadURL);
-	return downloadURL;
-};
+
+// Fetch schedules and image URLs on component mount
+onMounted(() => {
+	fetchSchedules();
+});
 
 const fetchSchedules = () => {
 	const schedulesCollection = collection(db, 'schedules');
 	const q = query(schedulesCollection, orderBy('startDate'));
-	onSnapshot(q, (snapshot) => {
-		schedules.value = snapshot.docs.map((doc) => doc.data());
+	onSnapshot(q, async (snapshot) => {
+		const newSchedules = [];
+		const newImageURLs = [];
+
+		for (const doc of snapshot.docs) {
+			const scheduleData = doc.data();
+			newSchedules.push(scheduleData);
+
+			const imageURL = await getImageURL(scheduleData.endDate);
+			newImageURLs.push(imageURL);
+		}
+
+		schedules.value = newSchedules;
+		imageURLs.value = newImageURLs;
 	});
 };
 
+const getImageURL = async (endDate) => {
+	const imageName = `${endDate}.jpg`;
+	const imageStorageRef = storageRef(imageRef.value, imageName);
+	const downloadURL = await getDownloadURL(imageStorageRef);
+	return downloadURL;
+};
 
-fetchSchedules();
 </script>
 
 <style></style>
