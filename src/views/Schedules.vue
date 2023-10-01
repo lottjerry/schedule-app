@@ -8,7 +8,12 @@
 		</div>
 
 		<!-- New Schedule Dialog -->
-		<v-dialog v-model="newScheduleDialog" max-width="400px">
+		<v-dialog
+			v-model="newScheduleDialog"
+			fullscreen
+			:scrim="false"
+			transition="dialog-bottom-transition"
+		>
 			<v-card d-flex justify-center align-center class="pa-16">
 				<v-card-title class="text-center" style="color: blue">
 					New Schedule
@@ -25,16 +30,47 @@
 						<p>Start Date: {{ startDate }}</p>
 						<p>End Date: {{ endDate }}</p>
 					</div>
-					<v-file-input
-						v-model="image"
+					<v-select
 						chips
 						multiple
-						variant="underlined"
-						label="Insert Schedule Image"
-					></v-file-input>
-					<p v-if="errMsg" class="mb-4 text-red">{{ errMsg }}</p>
+						label="Select Positions"
+						:items="positions"
+						variant="outlined"
+					></v-select>
 				</v-card-text>
-				<v-card-actions>
+				<v-card-text>
+					<v-table>
+						<thead>
+							<tr>
+								<th class="text-left"></th>
+								<th
+									class="text-left"
+									v-for="scheduleDate in scheduleDates"
+									:key="scheduleDate"
+								>
+									{{ scheduleDate }}
+								</th>
+							</tr>
+							<tr>
+								<th class="text-left"></th>
+								<th class="text-left" v-for="day in days" :key="day">
+									{{ day }}
+								</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr v-for="employee in employees" :key="employee">
+								<td>
+									<v-btn variant="plain" @click="toggleShowOptions">
+										{{ employee }}
+									</v-btn>
+								</td>
+							</tr>
+						</tbody>
+					</v-table>
+				</v-card-text>
+
+				<v-card-actions class="justify-center">
 					<v-btn
 						@click="createSchedule"
 						color="primary"
@@ -53,105 +89,63 @@
 					</v-btn>
 				</v-card-actions>
 			</v-card>
+			<v-dialog v-model="showOptions" width="80%">
+				<v-card width="80%" class="pa-10 ma-5">
+					<v-card-title primary-title> Employee: </v-card-title>
+					<v-card-item>
+						<v-select
+							label="Select Positions"
+							:items="options"
+							variant="outlined"
+						></v-select>
+					</v-card-item>
+				</v-card>
+			</v-dialog>
 		</v-dialog>
 
 		<!-- Schedule List -->
 		<div>
 			<h2>Schedules</h2>
-			<ul>
-				<li v-for="(schedule, index) in schedules" :key="schedule.endDate">
-					<h3>{{ schedule.startDate }} - {{ schedule.endDate }}</h3>
-					<img
-						:src="imageURLs[index]"
-						alt="Schedule Image"
-						style="height: 20vh"
-					/>
-				</li>
-			</ul>
 		</div>
 	</div>
 </template>
 
 <script setup>
-import { ref, watch, onMounted } from 'vue';
-import {
-	getStorage,
-	ref as storageRef,
-	getDownloadURL,
-	updateMetadata,
-	uploadBytes,
-} from 'firebase/storage';
-import {
-	collection,
-	getFirestore,
-	query,
-	orderBy,
-	onSnapshot,
-	addDoc,
-} from 'firebase/firestore';
+import { ref, watch } from 'vue';
+
 import Datepicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css';
 
 const newScheduleDialog = ref(false);
-const image = ref('');
-const errMsg = ref('');
+const showOptions = ref(false);
 const date = ref('');
 const startDate = ref('');
 const endDate = ref('');
-const db = getFirestore();
-const storage = getStorage();
-const imageRef = ref(storageRef(storage, 'images'));
-const schedules = ref([]);
-const imageURLs = ref([]);
+const scheduleDates = ref([]); // To store the array of dates
 
 // Show New Schedule Dialog
 const showNewScheduleDialog = () => {
 	newScheduleDialog.value = true;
 };
 
+//Show Options
+const toggleShowOptions = () => {
+	showOptions.value = true;
+};
+
 // Cancel New Schedule Dialog
 const cancelNewScheduleDialog = () => {
 	newScheduleDialog.value = false;
-	image.value = '';
 	startDate.value = '';
 	endDate.value = '';
+	scheduleDates.value = [];
 };
-
-// Create Schedule
-const createSchedule = async () => {
-  const docRef = await addDoc(collection(db, 'schedules'), {
-    startDate: startDate.value,
-    endDate: endDate.value,
-  });
-
-  if (image.value) {
-    const file = image.value[0];
-    const imageName = `${endDate.value}.jpg`;
-    const imageStorageRef = storageRef(imageRef.value, imageName);
-    await uploadBytes(imageStorageRef, file);
-
-    // Set image metadata with start date and end date
-    const metadata = {
-      customMetadata: {
-        startDate: startDate.value,
-        endDate: endDate.value,
-      },
-    };
-    await updateMetadata(imageStorageRef, metadata);
-
-    alert('File Successfully Uploaded!');
-  }
-
-  alert('Document written with ID: ' + docRef.id);
-
-  cancelNewScheduleDialog()
-};
-
 
 // Watch for changes in the date and update the formatted date
 watch(date, (newDate) => {
 	startDate.value = formatDate(newDate[0]);
 	endDate.value = formatDate(newDate[1]);
+	scheduleDates.value = generateDateArray(newDate[0], newDate[1]);
 });
 
 // Format the date to show only the month, day, and year
@@ -163,43 +157,86 @@ const formatDate = (date) => {
 	});
 };
 
-// Fetch schedules and image URLs on component mount
-onMounted(() => {
-	fetchSchedules();
-});
-
-// Watch for changes in the schedules array and fetch schedules
-watch(schedules, () => {
-  fetchSchedules();
-});
-
-const fetchSchedules = () => {
-	const schedulesCollection = collection(db, 'schedules');
-	const q = query(schedulesCollection, orderBy('startDate'));
-	onSnapshot(q, async (snapshot) => {
-		const newSchedules = [];
-		const newImageURLs = [];
-
-		for (const doc of snapshot.docs) {
-			const scheduleData = doc.data();
-			newSchedules.push(scheduleData);
-
-			const imageURL = await getImageURL(scheduleData.endDate);
-			newImageURLs.push(imageURL);
-		}
-
-		schedules.value = newSchedules;
-		imageURLs.value = newImageURLs;
+// Format the month and day
+const formatScheduleDate = (date) => {
+	return date.toLocaleDateString(undefined, {
+		month: 'long',
+		day: 'numeric',
 	});
 };
 
-const getImageURL = async (endDate) => {
-	const imageName = `${endDate}.jpg`;
-	const imageStorageRef = storageRef(imageRef.value, imageName);
-	const downloadURL = await getDownloadURL(imageStorageRef);
-	return downloadURL;
+// Function to generate an array of dates between start and end dates
+const generateDateArray = (start, end) => {
+	const dates = [];
+	let currentDate = new Date(start);
+
+	while (currentDate <= end) {
+		dates.push(formatScheduleDate(new Date(currentDate))); // Format the date and push it
+		currentDate.setDate(currentDate.getDate() + 1);
+	}
+
+	return dates;
 };
 
+// Data
+const employees = [
+	'KELLY',
+	'KIM',
+	'EMILY',
+	'KRISTEN',
+	'LEXIE',
+	'ANN',
+	'KAREN',
+	'ALISON',
+	'JENNIFER',
+	'MARGARET',
+	'MADDIE',
+	'MORGAN',
+	'SIDNEY',
+	'KATLYN',
+	'GAVIN',
+	'JOHN',
+	'WES',
+	'TRISTAN',
+	'ISAAC',
+	'GREGORY',
+	'DAYNE',
+	'CONNER',
+	'ISIAH',
+	'WILLIAM',
+	'CHRIS',
+	'JERRY',
+	'JACK',
+	'LANCE',
+];
+const positions = ['OFFICE', 'SCAN', 'CASHIER', 'STOCK'];
+const days = [
+	'SUNDAY',
+	'MONDAY',
+	'TUESDAY',
+	'WENDSDAY',
+	'THURSDAY',
+	'FRIDAY',
+	'SATURDAY',
+];
+
+const options = [
+	'7-4',
+	'6-3',
+	'8-5',
+	'12-9',
+	'2-9',
+	'4-9',
+	'9-6',
+	'3:30-9:30',
+	'4-9:30',
+	'6-5',
+	'7-3',
+	'12:30-9:30',
+	'OFF',
+	'NOT AVAILABLE',
+	'VACATION',
+];
 </script>
 
 <style></style>
