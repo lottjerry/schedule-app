@@ -61,9 +61,51 @@
 						<tbody>
 							<tr v-for="employee in employees" :key="employee">
 								<td>
-									<v-btn variant="plain" @click="toggleShowOptions">
-										{{ employee }}
+									<v-btn variant="plain" @click="selectEmployee(employee)">
+										{{ employee.name }}
 									</v-btn>
+								</td>
+									<td>
+									{{ employee.availability.SUNDAY }}
+									<div v-for="position in employee.positions.SUNDAY" :key="position">
+										{{ position }}
+									</div>
+								</td>
+								<td>
+									{{ employee.availability.MONDAY }}
+									<div v-for="position in employee.positions.MONDAY" :key="position">
+										{{ position }}
+									</div>
+								</td>
+								<td>
+									{{ employee.availability.TUESDAY }}
+									<div v-for="position in employee.positions.TUESDAY" :key="position">
+										{{ position }}
+									</div>
+								</td>
+								<td>
+									{{ employee.availability.WENDSDAY }}
+									<div v-for="position in employee.positions.WENDSDAY" :key="position">
+										{{ position }}
+									</div>
+								</td>
+								<td>
+									{{ employee.availability.THURSDAY }}
+									<div v-for="position in employee.positions.THURSDAY" :key="position">
+										{{ position }}
+									</div>
+								</td>
+								<td>
+									{{ employee.availability.FRIDAY }}
+									<div v-for="position in employee.positions.FRIDAY" :key="position">
+										{{ position }}
+									</div>
+								</td>
+								<td>
+									{{ employee.availability.SATURDAY }}
+									<div v-for="position in employee.positions.SATURDAY" :key="position">
+										{{ position }}
+									</div>
 								</td>
 							</tr>
 						</tbody>
@@ -91,7 +133,9 @@
 			</v-card>
 			<v-dialog v-model="showOptions" width="80%">
 				<v-card width="80%" class="pa-10 ma-5">
-					<v-card-title primary-title> Employee: </v-card-title>
+					<v-card-title primary-title>
+						Employee: {{ selectedEmployee }}</v-card-title
+					>
 					<v-card-item>
 						<v-select
 							label="Select Positions"
@@ -121,16 +165,609 @@ const showOptions = ref(false);
 const date = ref('');
 const startDate = ref('');
 const endDate = ref('');
+let selectedEmployee = ref('');
 const scheduleDates = ref([]); // To store the array of dates
+const employees = ref({
+	KELLY: {
+		name: 'KELLY',
+		availability: {
+			SUNDAY: '',
+			MONDAY: '',
+			TUESDAY: '',
+			WEDNESDAY: '',
+			THURSDAY: '',
+			FRIDAY: '',
+			SATURDAY: '',
+		},
+		positions: {
+			SUNDAY: [],
+			MONDAY: [],
+			TUESDAY: [],
+			WEDNESDAY: [],
+			THURSDAY: [],
+			FRIDAY: [],
+			SATURDAY: [],
+		},
+	},
+KIM: {
+		name: 'KIM',
+		availability: {
+			SUNDAY: '',
+			MONDAY: '',
+			TUESDAY: '',
+			WEDNESDAY: '',
+			THURSDAY: '',
+			FRIDAY: '',
+			SATURDAY: '',
+		},
+		positions: {
+			SUNDAY: [],
+			MONDAY: [],
+			TUESDAY: [],
+			WEDNESDAY: [],
+			THURSDAY: [],
+			FRIDAY: [],
+			SATURDAY: [],
+		},
+	},
+EMILY: {
+		name: 'EMILY',
+		availability: {
+			SUNDAY: '',
+			MONDAY: '',
+			TUESDAY: '',
+			WEDNESDAY: '',
+			THURSDAY: '',
+			FRIDAY: '',
+			SATURDAY: '',
+		},
+		positions: {
+			SUNDAY: [],
+			MONDAY: [],
+			TUESDAY: [],
+			WEDNESDAY: [],
+			THURSDAY: [],
+			FRIDAY: [],
+			SATURDAY: [],
+		},
+	},
+KRISTEN: {
+		name: 'KRISTEN',
+		availability: {
+			SUNDAY: '',
+			MONDAY: '',
+			TUESDAY: '',
+			WEDNESDAY: '',
+			THURSDAY: '',
+			FRIDAY: '',
+			SATURDAY: '',
+		},
+		positions: {
+			SUNDAY: [],
+			MONDAY: [],
+			TUESDAY: [],
+			WEDNESDAY: [],
+			THURSDAY: [],
+			FRIDAY: [],
+			SATURDAY: [],
+		},
+	},
+LEXIE: {
+		name: 'LEXIE',
+		availability: {
+			SUNDAY: '',
+			MONDAY: '',
+			TUESDAY: '',
+			WEDNESDAY: '',
+			THURSDAY: '',
+			FRIDAY: '',
+			SATURDAY: '',
+		},
+		positions: {
+			SUNDAY: [],
+			MONDAY: [],
+			TUESDAY: [],
+			WEDNESDAY: [],
+			THURSDAY: [],
+			FRIDAY: [],
+			SATURDAY: [],
+		},
+	},
+ANN: {
+		name: 'ANN',
+		availability: {
+			SUNDAY: '',
+			MONDAY: '',
+			TUESDAY: '',
+			WEDNESDAY: '',
+			THURSDAY: '',
+			FRIDAY: '',
+			SATURDAY: '',
+		},
+		positions: {
+			SUNDAY: [],
+			MONDAY: [],
+			TUESDAY: [],
+			WEDNESDAY: [],
+			THURSDAY: [],
+			FRIDAY: [],
+			SATURDAY: [],
+		},
+	},
+KAREN: {
+		name: 'KAREN',
+		availability: {
+			SUNDAY: '',
+			MONDAY: '',
+			TUESDAY: '',
+			WEDNESDAY: '',
+			THURSDAY: '',
+			FRIDAY: '',
+			SATURDAY: '',
+		},
+		positions: {
+			SUNDAY: [],
+			MONDAY: [],
+			TUESDAY: [],
+			WEDNESDAY: [],
+			THURSDAY: [],
+			FRIDAY: [],
+			SATURDAY: [],
+		},
+	},
+ALISON: {
+		name: 'ALISON',
+		availability: {
+			SUNDAY: '',
+			MONDAY: '',
+			TUESDAY: '',
+			WEDNESDAY: '',
+			THURSDAY: '',
+			FRIDAY: '',
+			SATURDAY: '',
+		},
+		positions: {
+			SUNDAY: [],
+			MONDAY: [],
+			TUESDAY: [],
+			WEDNESDAY: [],
+			THURSDAY: [],
+			FRIDAY: [],
+			SATURDAY: [],
+		},
+	},
+JENNIFER: {
+		name: 'JENNIFER',
+		availability: {
+			SUNDAY: '',
+			MONDAY: '',
+			TUESDAY: '',
+			WEDNESDAY: '',
+			THURSDAY: '',
+			FRIDAY: '',
+			SATURDAY: '',
+		},
+		positions: {
+			SUNDAY: [],
+			MONDAY: [],
+			TUESDAY: [],
+			WEDNESDAY: [],
+			THURSDAY: [],
+			FRIDAY: [],
+			SATURDAY: [],
+		},
+	},
+MARGARET: {
+		name: 'MARGARET',
+		availability: {
+			SUNDAY: '',
+			MONDAY: '',
+			TUESDAY: '',
+			WEDNESDAY: '',
+			THURSDAY: '',
+			FRIDAY: '',
+			SATURDAY: '',
+		},
+		positions: {
+			SUNDAY: [],
+			MONDAY: [],
+			TUESDAY: [],
+			WEDNESDAY: [],
+			THURSDAY: [],
+			FRIDAY: [],
+			SATURDAY: [],
+		},
+	},
+MADDIE: {
+		name: 'MADDIE',
+		availability: {
+			SUNDAY: '',
+			MONDAY: '',
+			TUESDAY: '',
+			WEDNESDAY: '',
+			THURSDAY: '',
+			FRIDAY: '',
+			SATURDAY: '',
+		},
+		positions: {
+			SUNDAY: [],
+			MONDAY: [],
+			TUESDAY: [],
+			WEDNESDAY: [],
+			THURSDAY: [],
+			FRIDAY: [],
+			SATURDAY: [],
+		},
+	},
+MORGAN: {
+		name: 'MORGAN',
+		availability: {
+			SUNDAY: '',
+			MONDAY: '',
+			TUESDAY: '',
+			WEDNESDAY: '',
+			THURSDAY: '',
+			FRIDAY: '',
+			SATURDAY: '',
+		},
+		positions: {
+			SUNDAY: [],
+			MONDAY: [],
+			TUESDAY: [],
+			WEDNESDAY: [],
+			THURSDAY: [],
+			FRIDAY: [],
+			SATURDAY: [],
+		},
+	},
+SIDNEY: {
+		name: 'SIDNEY',
+		availability: {
+			SUNDAY: '',
+			MONDAY: '',
+			TUESDAY: '',
+			WEDNESDAY: '',
+			THURSDAY: '',
+			FRIDAY: '',
+			SATURDAY: '',
+		},
+		positions: {
+			SUNDAY: [],
+			MONDAY: [],
+			TUESDAY: [],
+			WEDNESDAY: [],
+			THURSDAY: [],
+			FRIDAY: [],
+			SATURDAY: [],
+		},
+	},
+KATLYN: {
+		name: 'KATLYN',
+		availability: {
+			SUNDAY: '',
+			MONDAY: '',
+			TUESDAY: '',
+			WEDNESDAY: '',
+			THURSDAY: '',
+			FRIDAY: '',
+			SATURDAY: '',
+		},
+		positions: {
+			SUNDAY: [],
+			MONDAY: [],
+			TUESDAY: [],
+			WEDNESDAY: [],
+			THURSDAY: [],
+			FRIDAY: [],
+			SATURDAY: [],
+		},
+	},
+GAVIN: {
+		name: 'GAVIN',
+		availability: {
+			SUNDAY: '',
+			MONDAY: '',
+			TUESDAY: '',
+			WEDNESDAY: '',
+			THURSDAY: '',
+			FRIDAY: '',
+			SATURDAY: '',
+		},
+		positions: {
+			SUNDAY: [],
+			MONDAY: [],
+			TUESDAY: [],
+			WEDNESDAY: [],
+			THURSDAY: [],
+			FRIDAY: [],
+			SATURDAY: [],
+		},
+	},
+JOHN: {
+		name: 'JOHN',
+		availability: {
+			SUNDAY: '',
+			MONDAY: '',
+			TUESDAY: '',
+			WEDNESDAY: '',
+			THURSDAY: '',
+			FRIDAY: '',
+			SATURDAY: '',
+		},
+		positions: {
+			SUNDAY: [],
+			MONDAY: [],
+			TUESDAY: [],
+			WEDNESDAY: [],
+			THURSDAY: [],
+			FRIDAY: [],
+			SATURDAY: [],
+		},
+	},
+WES: {
+		name: 'WES',
+		availability: {
+			SUNDAY: '',
+			MONDAY: '',
+			TUESDAY: '',
+			WEDNESDAY: '',
+			THURSDAY: '',
+			FRIDAY: '',
+			SATURDAY: '',
+		},
+		positions: {
+			SUNDAY: [],
+			MONDAY: [],
+			TUESDAY: [],
+			WEDNESDAY: [],
+			THURSDAY: [],
+			FRIDAY: [],
+			SATURDAY: [],
+		},
+	},
+TRISTAN: {
+		name: 'TRISTAN',
+		availability: {
+			SUNDAY: '',
+			MONDAY: '',
+			TUESDAY: '',
+			WEDNESDAY: '',
+			THURSDAY: '',
+			FRIDAY: '',
+			SATURDAY: '',
+		},
+		positions: {
+			SUNDAY: [],
+			MONDAY: [],
+			TUESDAY: [],
+			WEDNESDAY: [],
+			THURSDAY: [],
+			FRIDAY: [],
+			SATURDAY: [],
+		},
+	},
+ISAAC: {
+		name: 'ISAAC',
+		availability: {
+			SUNDAY: '',
+			MONDAY: '',
+			TUESDAY: '',
+			WEDNESDAY: '',
+			THURSDAY: '',
+			FRIDAY: '',
+			SATURDAY: '',
+		},
+		positions: {
+			SUNDAY: [],
+			MONDAY: [],
+			TUESDAY: [],
+			WEDNESDAY: [],
+			THURSDAY: [],
+			FRIDAY: [],
+			SATURDAY: [],
+		},
+	},
+GREGORY: {
+		name: 'GREGORY',
+		availability: {
+			SUNDAY: '',
+			MONDAY: '',
+			TUESDAY: '',
+			WEDNESDAY: '',
+			THURSDAY: '',
+			FRIDAY: '',
+			SATURDAY: '',
+		},
+		positions: {
+			SUNDAY: [],
+			MONDAY: [],
+			TUESDAY: [],
+			WEDNESDAY: [],
+			THURSDAY: [],
+			FRIDAY: [],
+			SATURDAY: [],
+		},
+	},
+DAYNE: {
+		name: 'DAYNE',
+		availability: {
+			SUNDAY: '',
+			MONDAY: '',
+			TUESDAY: '',
+			WEDNESDAY: '',
+			THURSDAY: '',
+			FRIDAY: '',
+			SATURDAY: '',
+		},
+		positions: {
+			SUNDAY: [],
+			MONDAY: [],
+			TUESDAY: [],
+			WEDNESDAY: [],
+			THURSDAY: [],
+			FRIDAY: [],
+			SATURDAY: [],
+		},
+	},
+CONNER: {
+		name: 'CONNER',
+		availability: {
+			SUNDAY: '',
+			MONDAY: '',
+			TUESDAY: '',
+			WEDNESDAY: '',
+			THURSDAY: '',
+			FRIDAY: '',
+			SATURDAY: '',
+		},
+		positions: {
+			SUNDAY: [],
+			MONDAY: [],
+			TUESDAY: [],
+			WEDNESDAY: [],
+			THURSDAY: [],
+			FRIDAY: [],
+			SATURDAY: [],
+		},
+	},
+ISIAH: {
+		name: 'ISIAH',
+		availability: {
+			SUNDAY: '',
+			MONDAY: '',
+			TUESDAY: '',
+			WEDNESDAY: '',
+			THURSDAY: '',
+			FRIDAY: '',
+			SATURDAY: '',
+		},
+		positions: {
+			SUNDAY: [],
+			MONDAY: [],
+			TUESDAY: [],
+			WEDNESDAY: [],
+			THURSDAY: [],
+			FRIDAY: [],
+			SATURDAY: [],
+		},
+	},
+WILLIAM: {
+		name: 'WILLIAM',
+		availability: {
+			SUNDAY: '',
+			MONDAY: '',
+			TUESDAY: '',
+			WEDNESDAY: '',
+			THURSDAY: '',
+			FRIDAY: '',
+			SATURDAY: '',
+		},
+		positions: {
+			SUNDAY: [],
+			MONDAY: [],
+			TUESDAY: [],
+			WEDNESDAY: [],
+			THURSDAY: [],
+			FRIDAY: [],
+			SATURDAY: [],
+		},
+	},
+CHRIS: {
+		name: 'CHRIS',
+		availability: {
+			SUNDAY: '',
+			MONDAY: '',
+			TUESDAY: '',
+			WEDNESDAY: '',
+			THURSDAY: '',
+			FRIDAY: '',
+			SATURDAY: '',
+		},
+		positions: {
+			SUNDAY: [],
+			MONDAY: [],
+			TUESDAY: [],
+			WEDNESDAY: [],
+			THURSDAY: [],
+			FRIDAY: [],
+			SATURDAY: [],
+		},
+	},
+JERRY: {
+		name: 'JERRY',
+		availability: {
+			SUNDAY: '',
+			MONDAY: '',
+			TUESDAY: '',
+			WEDNESDAY: '',
+			THURSDAY: '',
+			FRIDAY: '',
+			SATURDAY: '',
+		},
+		positions: {
+			SUNDAY: [],
+			MONDAY: [],
+			TUESDAY: [],
+			WEDNESDAY: [],
+			THURSDAY: [],
+			FRIDAY: [],
+			SATURDAY: [],
+		},
+	},
+JACK: {
+		name: 'JACK',
+		availability: {
+			SUNDAY: '',
+			MONDAY: '',
+			TUESDAY: '',
+			WEDNESDAY: '',
+			THURSDAY: '',
+			FRIDAY: '',
+			SATURDAY: '',
+		},
+		positions: {
+			SUNDAY: [],
+			MONDAY: [],
+			TUESDAY: [],
+			WEDNESDAY: [],
+			THURSDAY: [],
+			FRIDAY: [],
+			SATURDAY: [],
+		},
+	},
+LANCE: {
+		name: 'LANCE',
+		availability: {
+			SUNDAY: '',
+			MONDAY: '',
+			TUESDAY: '',
+			WEDNESDAY: '',
+			THURSDAY: '',
+			FRIDAY: '',
+			SATURDAY: '',
+		},
+		positions: {
+			SUNDAY: [],
+			MONDAY: [],
+			TUESDAY: [],
+			WEDNESDAY: [],
+			THURSDAY: [],
+			FRIDAY: [],
+			SATURDAY: [],
+		},
+	},
+	// Add similar objects for other employees
+});
+console.log(employees);
+// Show Options
+const selectEmployee = (employee) => {
+	selectedEmployee.value = employee.name;
+	showOptions.value = true;
+};
 
 // Show New Schedule Dialog
 const showNewScheduleDialog = () => {
 	newScheduleDialog.value = true;
-};
-
-//Show Options
-const toggleShowOptions = () => {
-	showOptions.value = true;
 };
 
 // Cancel New Schedule Dialog
@@ -177,7 +814,7 @@ const generateDateArray = (start, end) => {
 
 	return dates;
 };
-
+/*
 // Data
 const employees = [
 	'KELLY',
@@ -209,6 +846,7 @@ const employees = [
 	'JACK',
 	'LANCE',
 ];
+*/
 const positions = ['OFFICE', 'SCAN', 'CASHIER', 'STOCK'];
 const days = [
 	'SUNDAY',
