@@ -208,11 +208,13 @@
 </template>
 
 <script setup>
+import { useRouter } from 'vue-router';
 import { ref, onMounted } from 'vue';
 import {
 	getAuth,
 	createUserWithEmailAndPassword,
 	sendPasswordResetEmail,
+	signOut
 } from 'firebase/auth';
 import {
 	getFirestore,
@@ -224,6 +226,7 @@ import {
 	updateDoc,
 } from 'firebase/firestore';
 
+const router = useRouter();
 const email = ref('');
 const password = ref('');
 const name = ref('');
@@ -267,6 +270,7 @@ const createUser = () => {
 			setDoc(doc(db, 'users', userCredentials.user.uid), newUser)
 				.then(() => {
 					alert(`Successfully created user ${firstName.value}`);
+					logout()
 					firstName.value = '';
 					lastName.value = '';
 					position.value = '';
@@ -367,6 +371,18 @@ const resetPassword = (user) => {
 			errMsg.value = `Error resetting password: ${error.message}`;
 		});
 };
+
+const logout = async () => {
+	const auth = getAuth()
+			try {
+				await signOut(auth);
+				router.push('/');
+			} catch (error) {
+				console.error(error);
+			}
+		};
+
+
 
 // Fetch users on component mount
 onMounted(fetchUsers);
