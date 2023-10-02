@@ -65,45 +65,66 @@
 										{{ employee.name }}
 									</v-btn>
 								</td>
-									<td>
+								<td>
 									{{ employee.availability.SUNDAY }}
-									<div v-for="position in employee.positions.SUNDAY" :key="position">
+									<div
+										v-for="position in employee.positions.SUNDAY"
+										:key="position"
+									>
 										{{ position }}
 									</div>
 								</td>
 								<td>
 									{{ employee.availability.MONDAY }}
-									<div v-for="position in employee.positions.MONDAY" :key="position">
+									<div
+										v-for="position in employee.positions.MONDAY"
+										:key="position"
+									>
 										{{ position }}
 									</div>
 								</td>
 								<td>
 									{{ employee.availability.TUESDAY }}
-									<div v-for="position in employee.positions.TUESDAY" :key="position">
+									<div
+										v-for="position in employee.positions.TUESDAY"
+										:key="position"
+									>
 										{{ position }}
 									</div>
 								</td>
 								<td>
 									{{ employee.availability.WENDSDAY }}
-									<div v-for="position in employee.positions.WENDSDAY" :key="position">
+									<div
+										v-for="position in employee.positions.WENDSDAY"
+										:key="position"
+									>
 										{{ position }}
 									</div>
 								</td>
 								<td>
 									{{ employee.availability.THURSDAY }}
-									<div v-for="position in employee.positions.THURSDAY" :key="position">
+									<div
+										v-for="position in employee.positions.THURSDAY"
+										:key="position"
+									>
 										{{ position }}
 									</div>
 								</td>
 								<td>
 									{{ employee.availability.FRIDAY }}
-									<div v-for="position in employee.positions.FRIDAY" :key="position">
+									<div
+										v-for="position in employee.positions.FRIDAY"
+										:key="position"
+									>
 										{{ position }}
 									</div>
 								</td>
 								<td>
 									{{ employee.availability.SATURDAY }}
-									<div v-for="position in employee.positions.SATURDAY" :key="position">
+									<div
+										v-for="position in employee.positions.SATURDAY"
+										:key="position"
+									>
 										{{ position }}
 									</div>
 								</td>
@@ -131,16 +152,30 @@
 					</v-btn>
 				</v-card-actions>
 			</v-card>
-			<v-dialog v-model="showOptions" width="80%">
+			<!-- EMPLOYEE DIALOG -->
+			<v-dialog v-model="showOptions" width="30%">
 				<v-card width="80%" class="pa-10 ma-5">
 					<v-card-title primary-title>
 						Employee: {{ selectedEmployee }}</v-card-title
 					>
-					<v-card-item>
+					<v-card-item v-for="day in days" :key="day">
+						<h6>{{ day }}</h6>
 						<v-select
-							label="Select Positions"
+							class="pa-2"
+							chips
+							density="compact"
+							label="Select Time"
 							:items="options"
-							variant="outlined"
+							variant="underlined"
+						></v-select>
+						<v-select
+							class="pa-2"
+							multiple
+							chips
+							density="compact"
+							label="Select Positions"
+							:items="positions"
+							variant="underlined"
 						></v-select>
 					</v-card-item>
 				</v-card>
@@ -189,7 +224,7 @@ const employees = ref({
 			SATURDAY: [],
 		},
 	},
-KIM: {
+	KIM: {
 		name: 'KIM',
 		availability: {
 			SUNDAY: '',
@@ -210,7 +245,7 @@ KIM: {
 			SATURDAY: [],
 		},
 	},
-EMILY: {
+	EMILY: {
 		name: 'EMILY',
 		availability: {
 			SUNDAY: '',
@@ -231,7 +266,7 @@ EMILY: {
 			SATURDAY: [],
 		},
 	},
-KRISTEN: {
+	KRISTEN: {
 		name: 'KRISTEN',
 		availability: {
 			SUNDAY: '',
@@ -252,7 +287,7 @@ KRISTEN: {
 			SATURDAY: [],
 		},
 	},
-LEXIE: {
+	LEXIE: {
 		name: 'LEXIE',
 		availability: {
 			SUNDAY: '',
@@ -273,7 +308,7 @@ LEXIE: {
 			SATURDAY: [],
 		},
 	},
-ANN: {
+	ANN: {
 		name: 'ANN',
 		availability: {
 			SUNDAY: '',
@@ -294,7 +329,7 @@ ANN: {
 			SATURDAY: [],
 		},
 	},
-KAREN: {
+	KAREN: {
 		name: 'KAREN',
 		availability: {
 			SUNDAY: '',
@@ -315,7 +350,7 @@ KAREN: {
 			SATURDAY: [],
 		},
 	},
-ALISON: {
+	ALISON: {
 		name: 'ALISON',
 		availability: {
 			SUNDAY: '',
@@ -336,7 +371,7 @@ ALISON: {
 			SATURDAY: [],
 		},
 	},
-JENNIFER: {
+	JENNIFER: {
 		name: 'JENNIFER',
 		availability: {
 			SUNDAY: '',
@@ -357,7 +392,7 @@ JENNIFER: {
 			SATURDAY: [],
 		},
 	},
-MARGARET: {
+	MARGARET: {
 		name: 'MARGARET',
 		availability: {
 			SUNDAY: '',
@@ -378,7 +413,7 @@ MARGARET: {
 			SATURDAY: [],
 		},
 	},
-MADDIE: {
+	MADDIE: {
 		name: 'MADDIE',
 		availability: {
 			SUNDAY: '',
@@ -399,7 +434,7 @@ MADDIE: {
 			SATURDAY: [],
 		},
 	},
-MORGAN: {
+	MORGAN: {
 		name: 'MORGAN',
 		availability: {
 			SUNDAY: '',
@@ -420,7 +455,7 @@ MORGAN: {
 			SATURDAY: [],
 		},
 	},
-SIDNEY: {
+	SIDNEY: {
 		name: 'SIDNEY',
 		availability: {
 			SUNDAY: '',
@@ -441,7 +476,7 @@ SIDNEY: {
 			SATURDAY: [],
 		},
 	},
-KATLYN: {
+	KATLYN: {
 		name: 'KATLYN',
 		availability: {
 			SUNDAY: '',
@@ -462,7 +497,7 @@ KATLYN: {
 			SATURDAY: [],
 		},
 	},
-GAVIN: {
+	GAVIN: {
 		name: 'GAVIN',
 		availability: {
 			SUNDAY: '',
@@ -483,7 +518,7 @@ GAVIN: {
 			SATURDAY: [],
 		},
 	},
-JOHN: {
+	JOHN: {
 		name: 'JOHN',
 		availability: {
 			SUNDAY: '',
@@ -504,7 +539,7 @@ JOHN: {
 			SATURDAY: [],
 		},
 	},
-WES: {
+	WES: {
 		name: 'WES',
 		availability: {
 			SUNDAY: '',
@@ -525,7 +560,7 @@ WES: {
 			SATURDAY: [],
 		},
 	},
-TRISTAN: {
+	TRISTAN: {
 		name: 'TRISTAN',
 		availability: {
 			SUNDAY: '',
@@ -546,7 +581,7 @@ TRISTAN: {
 			SATURDAY: [],
 		},
 	},
-ISAAC: {
+	ISAAC: {
 		name: 'ISAAC',
 		availability: {
 			SUNDAY: '',
@@ -567,7 +602,7 @@ ISAAC: {
 			SATURDAY: [],
 		},
 	},
-GREGORY: {
+	GREGORY: {
 		name: 'GREGORY',
 		availability: {
 			SUNDAY: '',
@@ -588,7 +623,7 @@ GREGORY: {
 			SATURDAY: [],
 		},
 	},
-DAYNE: {
+	DAYNE: {
 		name: 'DAYNE',
 		availability: {
 			SUNDAY: '',
@@ -609,7 +644,7 @@ DAYNE: {
 			SATURDAY: [],
 		},
 	},
-CONNER: {
+	CONNER: {
 		name: 'CONNER',
 		availability: {
 			SUNDAY: '',
@@ -630,7 +665,7 @@ CONNER: {
 			SATURDAY: [],
 		},
 	},
-ISIAH: {
+	ISIAH: {
 		name: 'ISIAH',
 		availability: {
 			SUNDAY: '',
@@ -651,7 +686,7 @@ ISIAH: {
 			SATURDAY: [],
 		},
 	},
-WILLIAM: {
+	WILLIAM: {
 		name: 'WILLIAM',
 		availability: {
 			SUNDAY: '',
@@ -672,7 +707,7 @@ WILLIAM: {
 			SATURDAY: [],
 		},
 	},
-CHRIS: {
+	CHRIS: {
 		name: 'CHRIS',
 		availability: {
 			SUNDAY: '',
@@ -693,7 +728,7 @@ CHRIS: {
 			SATURDAY: [],
 		},
 	},
-JERRY: {
+	JERRY: {
 		name: 'JERRY',
 		availability: {
 			SUNDAY: '',
@@ -714,7 +749,7 @@ JERRY: {
 			SATURDAY: [],
 		},
 	},
-JACK: {
+	JACK: {
 		name: 'JACK',
 		availability: {
 			SUNDAY: '',
@@ -735,7 +770,7 @@ JACK: {
 			SATURDAY: [],
 		},
 	},
-LANCE: {
+	LANCE: {
 		name: 'LANCE',
 		availability: {
 			SUNDAY: '',
@@ -758,7 +793,6 @@ LANCE: {
 	},
 	// Add similar objects for other employees
 });
-console.log(employees);
 // Show Options
 const selectEmployee = (employee) => {
 	selectedEmployee.value = employee.name;
@@ -859,18 +893,18 @@ const days = [
 ];
 
 const options = [
-	'7-4',
-	'6-3',
-	'8-5',
-	'12-9',
-	'2-9',
-	'4-9',
-	'9-6',
-	'3:30-9:30',
-	'4-9:30',
-	'6-5',
-	'7-3',
-	'12:30-9:30',
+	'7:00 am - 4:00 pm',
+	'6:00 am - 3:00 pm',
+	'8:00 am - 5:00 pm',
+	'12:00 pm - 9:00 pm',
+	'2:00 pm - 9:00 pm',
+	'4:00 pm - 9:00 pm',
+	'9:00 am - 6:00 pm',
+	'3:30 pm - 9:30 pm',
+	'4:00 pm -9:30 pm',
+	'6:00 am - 5:00 pm',
+	'7:00 am - 3:00 pm',
+	'12:30 pm - 9:30 pm',
 	'OFF',
 	'NOT AVAILABLE',
 	'VACATION',
