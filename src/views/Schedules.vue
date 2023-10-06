@@ -73,14 +73,6 @@
 
 				<v-card-actions class="justify-center">
 					<v-btn
-						@click="createSchedule"
-						color="primary"
-						variant="outlined"
-						elevation="1"
-					>
-						Create Schedule
-					</v-btn>
-					<v-btn
 						@click="cancelNewScheduleDialog"
 						color="primary"
 						variant="outlined"
@@ -88,11 +80,19 @@
 					>
 						Cancel
 					</v-btn>
+					<v-btn
+						@click="createSchedule"
+						color="primary"
+						variant="outlined"
+						elevation="1"
+					>
+						Create Schedule
+					</v-btn>
 				</v-card-actions>
 			</v-card>
 
 			<!-- ******* EDIT EMPLOYEE SCHEDULE ******* -->
-			<v-dialog v-model="showOptions" width="30%">
+			<v-dialog v-model="showEmployeeSchedule" width="30%">
 				<v-card width="80%" class="pa-10 ma-5">
 					<v-card-title primary-title>
 						Employee: {{ selectedEmployee }}</v-card-title
@@ -119,6 +119,16 @@
 							variant="underlined"
 						></v-select>
 					</v-card-item>
+					<v-card-actions class="justify-center">
+						<v-btn
+							@click="cancelEmployeeSchedule()"
+							color="primary"
+							variant="outlined"
+							class="mr-5"
+							>Cancel</v-btn
+						>
+						<v-btn color="primary" variant="outlined">Save</v-btn>
+					</v-card-actions>
 				</v-card>
 			</v-dialog>
 		</v-dialog>
@@ -137,7 +147,7 @@ import Datepicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css';
 
 const newScheduleDialog = ref(false);
-const showOptions = ref(false);
+const showEmployeeSchedule = ref(false);
 const date = ref('');
 const startDate = ref('');
 const endDate = ref('');
@@ -150,12 +160,12 @@ const employees = ref([
 		schedule: [
 			{
 				day: 'Sunday',
-				time: '',
+				time: null,
 				positions: [],
 			},
 			{
 				day: 'Monday',
-				time: '',
+				time: null,
 				positions: [],
 			},
 		],
@@ -165,23 +175,28 @@ const employees = ref([
 		schedule: [
 			{
 				day: 'Sunday',
-				time: '',
+				time: null,
 				positions: [],
 			},
 			{
 				day: 'Monday',
-				time: '',
+				time: null,
 				positions: [],
 			},
 		],
 	},
 ]);
 
-// Show Options
+// Show Employee Schedule Dialog
 const selectEmployee = (employee) => {
 	selectedEmployee.value = employee.name;
 	selectedSchedule.value = employee.schedule;
-	showOptions.value = true;
+	showEmployeeSchedule.value = true;
+};
+
+// Cancel Employee Schedule Dialog
+const cancelEmployeeSchedule = () => {
+	showEmployeeSchedule.value = false;
 };
 
 // Show New Schedule Dialog
@@ -198,7 +213,6 @@ const cancelNewScheduleDialog = () => {
 };
 
 // Reset Employee Data
-
 
 // Watch for changes in the date and update the formatted date
 watch(date, (newDate) => {
