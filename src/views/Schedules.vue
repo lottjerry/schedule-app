@@ -9,6 +9,7 @@
 		<!-- ******* NEW SCHEDULE DIALOG ******* -->
 		<v-dialog
 			v-model="newScheduleDialog"
+			persistent
 			fullscreen
 			:scrim="false"
 			transition="dialog-bottom-transition"
@@ -92,7 +93,7 @@
 			</v-card>
 
 			<!-- ******* EDIT EMPLOYEE SCHEDULE ******* -->
-			<v-dialog v-model="showEmployeeSchedule" width="30%">
+			<v-dialog v-model="showEmployeeSchedule" width="30%" persistent>
 				<v-card width="80%" class="pa-10 ma-5">
 					<v-card-title primary-title>
 						Employee: {{ selectedEmployee }}</v-card-title
@@ -192,10 +193,34 @@ const selectEmployee = (employee) => {
 	selectedEmployee.value = employee.name;
 	selectedSchedule.value = employee.schedule;
 	showEmployeeSchedule.value = true;
+
+};
+
+// Clear Employee Schedule Data
+const clearEmployeeData = () => {
+	for (let employee of employees.value) {
+		for (let schedule of employee.schedule) {
+			schedule.time = null;
+			schedule.positions = [];
+		}
+	}
 };
 
 // Cancel Employee Schedule Dialog
 const cancelEmployeeSchedule = () => {
+	// Clear the selected employee's time and positions
+    if (selectedEmployee.value) {
+        const selectedEmployeeIndex = employees.value.findIndex(
+            (employee) => employee.name === selectedEmployee.value
+        );
+        if (selectedEmployeeIndex !== -1) {
+            const selectedEmployeeSchedule = employees.value[selectedEmployeeIndex].schedule;
+            for (let schedule of selectedEmployeeSchedule) {
+                schedule.time = null;
+                schedule.positions = [];
+            }
+        }
+    }
 	showEmployeeSchedule.value = false;
 };
 
@@ -210,6 +235,7 @@ const cancelNewScheduleDialog = () => {
 	startDate.value = '';
 	endDate.value = '';
 	scheduleDates.value = [];
+	clearEmployeeData();
 };
 
 // Reset Employee Data
