@@ -122,13 +122,13 @@
 					</v-card-item>
 					<v-card-actions class="justify-center">
 						<v-btn
-							@click="cancelEmployeeSchedule()"
+							@click="cancelEmployeeSchedule"
 							color="primary"
 							variant="outlined"
 							class="mr-5"
 							>Cancel</v-btn
 						>
-						<v-btn color="primary" variant="outlined">Save</v-btn>
+						<v-btn @click="saveEmployeeData" color="primary" variant="outlined">Save</v-btn>
 					</v-card-actions>
 				</v-card>
 			</v-dialog>
@@ -157,7 +157,7 @@ let selectedSchedule = ref([]);
 const scheduleDates = ref([]); // To store the array of dates
 const employees = ref([
 	{
-		name: 'Jerry',
+		name: 'KELLY',
 		schedule: [
 			{
 				day: 'Sunday',
@@ -166,13 +166,38 @@ const employees = ref([
 			},
 			{
 				day: 'Monday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Tuesday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Wednesday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Thursday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Friday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Saturday',
 				time: null,
 				positions: [],
 			},
 		],
 	},
 	{
-		name: 'Kim',
+		name: 'KIM',
 		schedule: [
 			{
 				day: 'Sunday',
@@ -181,6 +206,1071 @@ const employees = ref([
 			},
 			{
 				day: 'Monday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Tuesday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Wednesday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Thursday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Friday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Saturday',
+				time: null,
+				positions: [],
+			},
+		],
+	},
+	{
+		name: 'EMILY',
+		schedule: [
+			{
+				day: 'Sunday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Monday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Tuesday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Wednesday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Thursday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Friday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Saturday',
+				time: null,
+				positions: [],
+			},
+		],
+	},
+	{
+		name: 'KRISTEN',
+		schedule: [
+			{
+				day: 'Sunday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Monday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Tuesday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Wednesday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Thursday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Friday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Saturday',
+				time: null,
+				positions: [],
+			},
+		],
+	},
+	{
+		name: 'LEXIE',
+		schedule: [
+			{
+				day: 'Sunday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Monday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Tuesday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Wednesday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Thursday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Friday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Saturday',
+				time: null,
+				positions: [],
+			},
+		],
+	},
+	{
+		name: 'ANN',
+		schedule: [
+			{
+				day: 'Sunday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Monday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Tuesday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Wednesday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Thursday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Friday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Saturday',
+				time: null,
+				positions: [],
+			},
+		],
+	},
+	{
+		name: 'KAREN',
+		schedule: [
+			{
+				day: 'Sunday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Monday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Tuesday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Wednesday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Thursday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Friday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Saturday',
+				time: null,
+				positions: [],
+			},
+		],
+	},
+	{
+		name: 'ALISON',
+		schedule: [
+			{
+				day: 'Sunday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Monday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Tuesday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Wednesday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Thursday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Friday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Saturday',
+				time: null,
+				positions: [],
+			},
+		],
+	},
+	{
+		name: 'JENNIFER',
+		schedule: [
+			{
+				day: 'Sunday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Monday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Tuesday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Wednesday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Thursday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Friday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Saturday',
+				time: null,
+				positions: [],
+			},
+		],
+	},
+	{
+		name: 'MARGARET',
+		schedule: [
+			{
+				day: 'Sunday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Monday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Tuesday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Wednesday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Thursday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Friday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Saturday',
+				time: null,
+				positions: [],
+			},
+		],
+	},
+	{
+		name: 'MADDIE',
+		schedule: [
+			{
+				day: 'Sunday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Monday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Tuesday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Wednesday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Thursday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Friday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Saturday',
+				time: null,
+				positions: [],
+			},
+		],
+	},
+	{
+		name: 'MORGAN',
+		schedule: [
+			{
+				day: 'Sunday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Monday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Tuesday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Wednesday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Thursday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Friday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Saturday',
+				time: null,
+				positions: [],
+			},
+		],
+	},
+	{
+		name: 'SIDNEY',
+		schedule: [
+			{
+				day: 'Sunday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Monday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Tuesday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Wednesday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Thursday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Friday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Saturday',
+				time: null,
+				positions: [],
+			},
+		],
+	},
+	{
+		name: 'KATLYN',
+		schedule: [
+			{
+				day: 'Sunday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Monday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Tuesday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Wednesday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Thursday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Friday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Saturday',
+				time: null,
+				positions: [],
+			},
+		],
+	},
+	{
+		name: 'GAVIN',
+		schedule: [
+			{
+				day: 'Sunday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Monday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Tuesday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Wednesday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Thursday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Friday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Saturday',
+				time: null,
+				positions: [],
+			},
+		],
+	},
+	{
+		name: 'JOHN',
+		schedule: [
+			{
+				day: 'Sunday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Monday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Tuesday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Wednesday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Thursday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Friday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Saturday',
+				time: null,
+				positions: [],
+			},
+		],
+	},
+	{
+		name: 'WES',
+		schedule: [
+			{
+				day: 'Sunday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Monday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Tuesday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Wednesday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Thursday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Friday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Saturday',
+				time: null,
+				positions: [],
+			},
+		],
+	},
+	{
+		name: 'TRISTAN',
+		schedule: [
+			{
+				day: 'Sunday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Monday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Tuesday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Wednesday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Thursday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Friday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Saturday',
+				time: null,
+				positions: [],
+			},
+		],
+	},
+	{
+		name: 'ISAAC',
+		schedule: [
+			{
+				day: 'Sunday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Monday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Tuesday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Wednesday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Thursday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Friday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Saturday',
+				time: null,
+				positions: [],
+			},
+		],
+	},
+	{
+		name: 'GREGORY',
+		schedule: [
+			{
+				day: 'Sunday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Monday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Tuesday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Wednesday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Thursday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Friday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Saturday',
+				time: null,
+				positions: [],
+			},
+		],
+	},
+	{
+		name: 'DAYNE',
+		schedule: [
+			{
+				day: 'Sunday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Monday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Tuesday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Wednesday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Thursday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Friday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Saturday',
+				time: null,
+				positions: [],
+			},
+		],
+	},
+	{
+		name: 'CONNER',
+		schedule: [
+			{
+				day: 'Sunday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Monday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Tuesday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Wednesday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Thursday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Friday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Saturday',
+				time: null,
+				positions: [],
+			},
+		],
+	},
+	{
+		name: 'ISIAH',
+		schedule: [
+			{
+				day: 'Sunday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Monday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Tuesday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Wednesday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Thursday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Friday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Saturday',
+				time: null,
+				positions: [],
+			},
+		],
+	},
+	{
+		name: 'WILLIAM',
+		schedule: [
+			{
+				day: 'Sunday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Monday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Tuesday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Wednesday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Thursday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Friday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Saturday',
+				time: null,
+				positions: [],
+			},
+		],
+	},
+	{
+		name: 'CHRIS',
+		schedule: [
+			{
+				day: 'Sunday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Monday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Tuesday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Wednesday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Thursday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Friday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Saturday',
+				time: null,
+				positions: [],
+			},
+		],
+	},
+	{
+		name: 'JERRY',
+		schedule: [
+			{
+				day: 'Sunday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Monday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Tuesday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Wednesday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Thursday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Friday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Saturday',
+				time: null,
+				positions: [],
+			},
+		],
+	},
+	{
+		name: 'JACK',
+		schedule: [
+			{
+				day: 'Sunday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Monday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Tuesday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Wednesday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Thursday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Friday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Saturday',
+				time: null,
+				positions: [],
+			},
+		],
+	},
+	{
+		name: 'LANCE',
+		schedule: [
+			{
+				day: 'Sunday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Monday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Tuesday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Wednesday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Thursday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Friday',
+				time: null,
+				positions: [],
+			},
+			{
+				day: 'Saturday',
 				time: null,
 				positions: [],
 			},
@@ -193,7 +1283,6 @@ const selectEmployee = (employee) => {
 	selectedEmployee.value = employee.name;
 	selectedSchedule.value = employee.schedule;
 	showEmployeeSchedule.value = true;
-
 };
 
 // Clear Employee Schedule Data
@@ -206,21 +1295,25 @@ const clearEmployeeData = () => {
 	}
 };
 
+// Save Employee Data
+const saveEmployeeData = () => showEmployeeSchedule.value = false
+
 // Cancel Employee Schedule Dialog
 const cancelEmployeeSchedule = () => {
 	// Clear the selected employee's time and positions
-    if (selectedEmployee.value) {
-        const selectedEmployeeIndex = employees.value.findIndex(
-            (employee) => employee.name === selectedEmployee.value
-        );
-        if (selectedEmployeeIndex !== -1) {
-            const selectedEmployeeSchedule = employees.value[selectedEmployeeIndex].schedule;
-            for (let schedule of selectedEmployeeSchedule) {
-                schedule.time = null;
-                schedule.positions = [];
-            }
-        }
-    }
+	if (selectedEmployee.value) {
+		const selectedEmployeeIndex = employees.value.findIndex(
+			(employee) => employee.name === selectedEmployee.value
+		);
+		if (selectedEmployeeIndex !== -1) {
+			const selectedEmployeeSchedule =
+				employees.value[selectedEmployeeIndex].schedule;
+			for (let schedule of selectedEmployeeSchedule) {
+				schedule.time = null;
+				schedule.positions = [];
+			}
+		}
+	}
 	showEmployeeSchedule.value = false;
 };
 
