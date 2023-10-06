@@ -20,16 +20,19 @@
 				</v-card-title>
 				<v-card-text>
 					<Datepicker
+						class="justify-center"
 						v-model="date"
 						week-picker
 						week-start="0"
 						inline
 						auto-apply
 					/>
-					<div v-if="startDate">
+					<!-- 
+					<div v-if="startDate" class="justify-center border">
 						<p>Start Date: {{ startDate }}</p>
 						<p>End Date: {{ endDate }}</p>
 					</div>
+					-->
 				</v-card-text>
 				<!-- ******* SCHEDULE PREVIEW ******* -->
 				<v-card-text>
@@ -99,26 +102,28 @@
 						Employee: {{ selectedEmployee }}</v-card-title
 					>
 					<v-card-item v-for="schedule in selectedSchedule" :key="schedule">
-						<h6>{{ schedule.day }}</h6>
-						<v-select
+						<h4>{{ schedule.day }}</h4>
+						<v-combobox
 							class="pa-2"
+							clearable
 							v-model="schedule.time"
 							chips
 							density="compact"
 							label="Select Time"
 							:items="options"
-							variant="underlined"
-						></v-select>
-						<v-select
+							variant="outlined"
+						></v-combobox>
+						<v-combobox
 							class="pa-2"
+							clearable
 							v-model="schedule.positions"
 							multiple
 							chips
 							density="compact"
 							label="Select Positions"
 							:items="positions"
-							variant="underlined"
-						></v-select>
+							variant="outlined"
+						></v-combobox>
 					</v-card-item>
 					<v-card-actions class="justify-center">
 						<v-btn
@@ -128,7 +133,9 @@
 							class="mr-5"
 							>Cancel</v-btn
 						>
-						<v-btn @click="saveEmployeeData" color="primary" variant="outlined">Save</v-btn>
+						<v-btn @click="saveEmployeeData" color="primary" variant="outlined"
+							>Save</v-btn
+						>
 					</v-card-actions>
 				</v-card>
 			</v-dialog>
@@ -1296,7 +1303,7 @@ const clearEmployeeData = () => {
 };
 
 // Save Employee Data
-const saveEmployeeData = () => showEmployeeSchedule.value = false
+const saveEmployeeData = () => (showEmployeeSchedule.value = false);
 
 // Cancel Employee Schedule Dialog
 const cancelEmployeeSchedule = () => {
