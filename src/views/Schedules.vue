@@ -150,9 +150,11 @@
 
 <script setup>
 import { ref, watch } from 'vue';
-
+import { collection, addDoc, getFirestore } from 'firebase/firestore';
 import Datepicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css';
+
+const db = getFirestore();
 
 const newScheduleDialog = ref(false);
 const showEmployeeSchedule = ref(false);
@@ -1284,6 +1286,22 @@ const employees = ref([
 		],
 	},
 ]);
+
+const createSchedule = async () => {
+	//const scheduleTitle = `${startDate.value} - ${endDate.value}`
+	const employeesCollection = collection(db, endDate.value); // Replace 'employees' with your Firestore collection name
+
+	for (const employee of employees.value) {
+		try {
+			await addDoc(employeesCollection, employee);
+			console.log(`Employee ${employee.name} added to Firestore`);
+		} catch (error) {
+			console.error(`Error adding employee ${employee.name}:`, error);
+		}
+	}
+	alert(`New Schedule with end date ${endDate.value} has been made`);
+	cancelNewScheduleDialog();
+};
 
 // Show Employee Schedule Dialog
 const selectEmployee = (employee) => {
