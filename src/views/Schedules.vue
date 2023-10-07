@@ -1289,18 +1289,23 @@ const employees = ref([
 
 const createSchedule = async () => {
 	//const scheduleTitle = `${startDate.value} - ${endDate.value}`;
-	//const employeesCollection = collection(db, endDate.value); // Replace 'employees' with your Firestore collection name
+	// Replace 'employees' with your Firestore collection name
+	createDocument()
 
 	for (const employee of employees.value) {
 		try {
-			await setDoc(doc(db, endDate.value, employee.name), {
-				name: employee.name,
-				schedule: employee.schedule.map((day) => ({
-					day: day.day,
-					time: day.time,
-					positions: day.positions,
-				})),
-			}, { merge: true });
+			await setDoc(
+				doc(db, 'Schedules', endDate.value, endDate.value, employee.name),
+				{
+					name: employee.name,
+					schedule: employee.schedule.map((day) => ({
+						day: day.day,
+						time: day.time,
+						positions: day.positions,
+					})),
+				},
+				{ merge: true }
+			);
 			console.log(`Employee ${employee.name} added to Firestore`);
 		} catch (error) {
 			console.error(`Error adding employee ${employee.name}:`, error);
@@ -1309,6 +1314,26 @@ const createSchedule = async () => {
 	alert(`New Schedule with end date ${endDate.value} has been made`);
 	cancelNewScheduleDialog();
 };
+
+const createDocument = async () => {
+  // Generate a custom document ID or use an existing one
+  const customDocumentID = endDate.value; // Replace 'your_custom_id' with the ID you want to assign
+
+  try {
+    // Specify the custom document ID when creating the endDate document
+    const endDateDocRef = doc(db, 'Schedules', customDocumentID);
+
+    await setDoc(endDateDocRef, {
+      // Include other data for the endDate document
+      name: endDate.value, // Modify this as needed
+    }, {merge: true});
+
+    console.log(`EndDate document added to Firestore with ID: ${customDocumentID}`);
+  } catch (error) {
+    console.error('Error adding endDate document:', error);
+  }
+};
+
 
 // Show Employee Schedule Dialog
 const selectEmployee = (employee) => {
