@@ -1288,19 +1288,19 @@ const employees = ref([
 ]);
 
 const createSchedule = async () => {
-	const scheduleTitle = `${startDate.value} - ${endDate.value}`;
+	//const scheduleTitle = `${startDate.value} - ${endDate.value}`;
 	//const employeesCollection = collection(db, endDate.value); // Replace 'employees' with your Firestore collection name
 
 	for (const employee of employees.value) {
 		try {
-			await setDoc(doc(db, scheduleTitle, employee.name), {
+			await setDoc(doc(db, endDate.value, employee.name), {
 				name: employee.name,
 				schedule: employee.schedule.map((day) => ({
 					day: day.day,
 					time: day.time,
 					positions: day.positions,
 				})),
-			});
+			}, { merge: true });
 			console.log(`Employee ${employee.name} added to Firestore`);
 		} catch (error) {
 			console.error(`Error adding employee ${employee.name}:`, error);
