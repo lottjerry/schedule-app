@@ -21,8 +21,8 @@
 					<thead>
 						<tr>
 							<th class="text-left border"></th>
-							<th class="text-left border" v-for="n in 7" :key="n">
-								{{ n }}
+							<th class="text-left border" v-for="date in dates" :key="date">
+								{{ date }}
 							</th>
 						</tr>
 						<tr>
@@ -45,8 +45,8 @@
 								class="border"
 							>
 								<div class="pa-5">
-                  <h4>{{ employeeSchedule.time }}</h4>
-									
+									<h4>{{ employeeSchedule.time }}</h4>
+
 									<h4
 										v-for="position in employeeSchedule.positions"
 										:key="position"
@@ -72,6 +72,7 @@ const db = getFirestore();
 
 let schedulesID = ref([]);
 let schedules = ref([]);
+let dates = ref([]);
 let selectedSchedule = ref(); // To store the selected value
 
 const fetchSchedulesID = async () => {
@@ -102,9 +103,29 @@ const fetchSchedules = async () => {
 	});
 };
 
+// Function to generate an array of formatted date strings for 7 previous days before the end date
+const generateDateArray = () => {
+	dates.value = [];
+
+	const endDate = new Date(selectedSchedule.value);
+
+	for (let i = 6; i >= 0; i--) {
+		const currentDate = new Date(endDate);
+		currentDate.setDate(endDate.getDate() - i);
+		const formattedDate = currentDate.toLocaleDateString(undefined, {
+			year: 'numeric',
+			month: 'long',
+			day: 'numeric',
+		}); // Format the date as desired
+		dates.value.push(formattedDate);
+	}
+};
+
 // Watch for changes in the date and update the formatted date
 watch(selectedSchedule, () => {
 	fetchSchedules();
+	generateDateArray();
+	console.log(dates.value);
 });
 
 onMounted(() => {
