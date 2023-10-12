@@ -4,6 +4,11 @@
 			<v-row class="justify-center pa-10">
 				<h1 class="text-primary">Schedules</h1>
 			</v-row>
+			<v-row
+				><v-btn variant="outlined" @click="fetchData">
+					Fetch Data
+				</v-btn></v-row
+			>
 			<v-row class="justify-center pa-10">
 				<v-col cols="2">
 					<v-select
@@ -65,15 +70,31 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue';
+import { ref, watch } from 'vue';
 import { getFirestore, query, collection, getDocs } from 'firebase/firestore';
 
 const db = getFirestore();
 
+let currentSchedule = ref([]);
+let nextSchedule = ref([]);
 let schedulesID = ref([]);
 let schedules = ref([]);
 let dates = ref([]);
 let selectedSchedule = ref(); // To store the selected value
+
+// Current Problem: Fetch Schedule IDs but not the actual schedule data. Have to click Fetch Data Button Twice
+const fetchData = async () => {
+	try {
+		await fetchSchedulesID();
+		await fetchCurrentSchedule();
+		await fetchNextSchedule();
+		alert('Data Fetched');
+	} catch (error) {
+		console.error('An error occurred: ', error);
+	}
+};
+
+// You should have two functions that return Promises, fetchSchedulesID and fetchSchedules.
 
 const fetchSchedulesID = async () => {
 	const querySnap = await getDocs(query(collection(db, 'Schedules')));
@@ -86,7 +107,7 @@ const fetchSchedulesID = async () => {
 		schedulesID.value.push(doc.id);
 	});
 };
-
+/*
 const fetchSchedules = async () => {
 	const querySnap = await getDocs(
 		query(
@@ -100,6 +121,27 @@ const fetchSchedules = async () => {
 	);
 	querySnap.forEach((doc) => {
 		schedules.value.push(doc.data());
+	});
+};
+*/
+const fetchNextSchedule = async () => {
+	const querySnap = await getDocs(
+		query(
+			collection(db, 'Schedules', schedulesID.value[0], schedulesID.value[0])
+		)
+	);
+	querySnap.forEach((doc) => {
+		nextSchedule.value.push(doc.data());
+	});
+};
+const fetchCurrentSchedule = async () => {
+	const querySnap = await getDocs(
+		query(
+			collection(db, 'Schedules', schedulesID.value[1], schedulesID.value[1])
+		)
+	);
+	querySnap.forEach((doc) => {
+		currentSchedule.value.push(doc.data());
 	});
 };
 
@@ -122,15 +164,22 @@ const generateDateArray = () => {
 };
 
 // Watch for changes in the date and update the formatted date
-watch(selectedSchedule, () => {
-	fetchSchedules();
+
+watch(selectedSchedule, (newValue) => {
 	generateDateArray();
-	console.log(dates.value);
+	if(newValue === schedulesID.value[0]) {
+		schedules.value = nextSchedule.value
+	} else {
+		schedules.value = currentSchedule.value
+	}
+	console.log(schedules.value)
 });
+/*
 
 onMounted(() => {
 	fetchSchedulesID();
 });
+*/
 
 const days = [
 	'SUNDAY',
