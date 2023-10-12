@@ -25,13 +25,13 @@
 				<v-table>
 					<thead>
 						<tr>
-							<th class="text-left border"></th>
+							<th v-if="selectedSchedule" class="text-left border"></th>
 							<th class="text-left border" v-for="date in dates" :key="date">
 								{{ date }}
 							</th>
 						</tr>
 						<tr>
-							<th class="text-left border"></th>
+							<th v-if="selectedSchedule"  class="text-left border"></th>
 							<th class="text-left border" v-for="day in days" :key="day">
 								<h2 class="pa-2">{{ day }}</h2>
 							</th>
