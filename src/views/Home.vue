@@ -5,7 +5,11 @@
 				<h1 class="text-primary">Schedules</h1>
 			</v-row>
 			<v-row
-				><v-btn variant="outlined" @click="fetchData">
+				><v-btn
+					variant="outlined"
+					@click="fetchData"
+					:disabled="buttonDisabled"
+				>
 					Fetch Data
 				</v-btn></v-row
 			>
@@ -14,26 +18,38 @@
 					<v-select
 						color="primary"
 						label="Select"
+						:hint="`${name} - ${status}`"
 						:items="schedulesID"
+						item-title="status"
+						item-value="name"
 						v-model="selectedSchedule"
 						variant="outlined"
+						persistent-hint
+						return-object
+						single-line
 					></v-select>
 				</v-col>
 			</v-row>
+
 			<!-- ******* SCHEDULES VIEW ******* -->
 			<v-row>
 				<v-table>
 					<thead>
 						<tr>
 							<th v-if="selectedSchedule" class="text-left border"></th>
-							<th class="text-left border" v-for="date in dates" :key="date">
+							<th
+								class="text-left border"
+								v-for="date in dates"
+								:key="date"
+								:class="{ 'text-primary custom_border': isToday(date) }"
+							>
 								{{ date }}
 							</th>
 						</tr>
 						<tr>
-							<th v-if="selectedSchedule"  class="text-left border"></th>
+							<th v-if="selectedSchedule" class="text-left border"></th>
 							<th class="text-left border" v-for="day in days" :key="day">
-								<h2 class="pa-2">{{ day }}</h2>
+								<h2 class="pa-2" >{{ day }}</h2>
 							</th>
 						</tr>
 					</thead>
@@ -70,7 +86,7 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue';
+import { ref, watch, onMounted } from 'vue';
 import { getFirestore, query, collection, getDocs } from 'firebase/firestore';
 
 const db = getFirestore();
@@ -78,9 +94,46 @@ const db = getFirestore();
 let currentSchedule = ref([]);
 let nextSchedule = ref([]);
 let schedulesID = ref([]);
+let scheduleStatus = ref([]);
 let schedules = ref([]);
 let dates = ref([]);
+let name = ref('');
+let status = ref('');
+const buttonDisabled = ref(false);
 let selectedSchedule = ref(); // To store the selected value
+
+const saveDataToSession = () => {
+	sessionStorage.setItem('schedulesID', JSON.stringify(schedulesID.value));
+	sessionStorage.setItem(
+		'scheduleStatus',
+		JSON.stringify(scheduleStatus.value)
+	);
+	sessionStorage.setItem(
+		'currentSchedule',
+		JSON.stringify(currentSchedule.value)
+	);
+	sessionStorage.setItem('nextSchedule', JSON.stringify(nextSchedule.value));
+};
+
+const loadDataFromSession = () => {
+	const storedSchedulesID = sessionStorage.getItem('schedulesID');
+	const storedScheduleStatus = sessionStorage.getItem('scheduleStatus');
+	const storedCurrentSchedule = sessionStorage.getItem('currentSchedule');
+	const storedNextSchedule = sessionStorage.getItem('nextSchedule');
+
+	if (storedSchedulesID) {
+		schedulesID.value = JSON.parse(storedSchedulesID);
+	}
+	if (storedScheduleStatus) {
+		scheduleStatus.value = JSON.parse(storedScheduleStatus);
+	}
+	if (storedCurrentSchedule) {
+		currentSchedule.value = JSON.parse(storedCurrentSchedule);
+	}
+	if (storedNextSchedule) {
+		nextSchedule.value = JSON.parse(storedNextSchedule);
+	}
+};
 
 // Current Problem: Fetch Schedule IDs but not the actual schedule data. Have to click Fetch Data Button Twice
 const fetchData = async () => {
@@ -89,6 +142,9 @@ const fetchData = async () => {
 		await fetchCurrentSchedule();
 		await fetchNextSchedule();
 		alert('Data Fetched');
+
+		// Save the data to session storage
+		saveDataToSession();
 	} catch (error) {
 		console.error('An error occurred: ', error);
 	}
@@ -101,33 +157,22 @@ const fetchSchedulesID = async () => {
 
 	// Clear the schedules array before populating it
 	schedulesID.value = [];
-
 	// Add each doc's "name" field to the schedules array
 	querySnap.forEach((doc) => {
-		schedulesID.value.push(doc.id);
+		schedulesID.value.push(doc.data());
+		scheduleStatus.value.push(doc.data().status);
 	});
 };
-/*
-const fetchSchedules = async () => {
+
+const fetchNextSchedule = async () => {
 	const querySnap = await getDocs(
 		query(
 			collection(
 				db,
 				'Schedules',
-				selectedSchedule.value,
-				selectedSchedule.value
+				schedulesID.value[0].name,
+				schedulesID.value[0].name
 			)
-		)
-	);
-	querySnap.forEach((doc) => {
-		schedules.value.push(doc.data());
-	});
-};
-*/
-const fetchNextSchedule = async () => {
-	const querySnap = await getDocs(
-		query(
-			collection(db, 'Schedules', schedulesID.value[0], schedulesID.value[0])
 		)
 	);
 	querySnap.forEach((doc) => {
@@ -137,7 +182,12 @@ const fetchNextSchedule = async () => {
 const fetchCurrentSchedule = async () => {
 	const querySnap = await getDocs(
 		query(
-			collection(db, 'Schedules', schedulesID.value[1], schedulesID.value[1])
+			collection(
+				db,
+				'Schedules',
+				schedulesID.value[1].name,
+				schedulesID.value[1].name
+			)
 		)
 	);
 	querySnap.forEach((doc) => {
@@ -148,8 +198,13 @@ const fetchCurrentSchedule = async () => {
 // Function to generate an array of formatted date strings for 7 previous days before the end date
 const generateDateArray = () => {
 	dates.value = [];
+	name.value = null;
+	status.value = null;
 
-	const endDate = new Date(selectedSchedule.value);
+	name.value = selectedSchedule.value.name;
+	status.value = selectedSchedule.value.status;
+
+	const endDate = new Date(selectedSchedule.value.name);
 
 	for (let i = 6; i >= 0; i--) {
 		const currentDate = new Date(endDate);
@@ -163,23 +218,47 @@ const generateDateArray = () => {
 	}
 };
 
+// Format the date to show only the month, day, and year
+const formatDate = (date) => {
+	return date.toLocaleDateString(undefined, {
+		year: 'numeric',
+		month: 'long',
+		day: 'numeric',
+	});
+};
+
+// Get current Day
+
+const isToday = (date) => {
+	const today = new Date();
+	const formattedDate = formatDate(today);
+	return formattedDate === date;
+};
+
 // Watch for changes in the date and update the formatted date
 
 watch(selectedSchedule, (newValue) => {
 	generateDateArray();
-	if(newValue === schedulesID.value[0]) {
-		schedules.value = nextSchedule.value
-	} else {
-		schedules.value = currentSchedule.value
-	}
-	console.log(schedules.value)
-});
-/*
 
-onMounted(() => {
-	fetchSchedulesID();
+	if (newValue === schedulesID.value[0]) {
+		schedules.value = nextSchedule.value;
+	} else {
+		schedules.value = currentSchedule.value;
+	}
 });
-*/
+
+watch(schedulesID, () => {
+	if (schedulesID.value) {
+		buttonDisabled.value = true;
+	} else {
+		buttonDisabled.value = false;
+	}
+});
+
+// Load data from storage when the component is mounted
+onMounted(() => {
+	loadDataFromSession();
+});
 
 const days = [
 	'SUNDAY',
@@ -192,4 +271,9 @@ const days = [
 ];
 </script>
 
-<style lang="scss" scoped></style>
+<style sc>
+.custom_border {
+	border-color: #6200EE !important;
+	border-width: 3px !important;
+}
+</style>
