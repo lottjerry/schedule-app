@@ -27,13 +27,25 @@
 						inline
 						auto-apply
 					/>
-					<!-- 
-					<div v-if="startDate" class="justify-center border">
-						<p>Start Date: {{ startDate }}</p>
-						<p>End Date: {{ endDate }}</p>
-					</div>
-					-->
 				</v-card-text>
+				<v-card-text>
+					<v-container class="border">
+						<v-row class="justify-center">
+							<v-col cols="1" class="justify-center">
+								<p>Schedule Status</p>
+								<v-switch
+									class="justify-center"
+									v-model="scheduleStatus"
+									hide-details
+									true-value="Next"
+									false-value="Current"
+									:label="scheduleStatus"
+								></v-switch
+							></v-col>
+						</v-row>
+					</v-container>
+				</v-card-text>
+
 				<!-- ******* SCHEDULE PREVIEW ******* -->
 				<v-card-text>
 					<v-table>
@@ -142,15 +154,51 @@
 		</v-dialog>
 
 		<!-- Schedule List -->
-		<div>
-			<h2>Schedules</h2>
-		</div>
+		<v-container class="border ma-5 pa-5">
+			<v-row class="justify-center">
+				<h2>Schedules</h2>
+			</v-row>
+			<v-row
+				v-for="schedule in schedules"
+				:key="schedule"
+				class="pa-5 mx-10 my-5 justify-center"
+				><v-card width="30%">
+					<v-container class="border">
+						<v-row>
+							<v-col cols="8"
+								><p>{{ schedule.name }} - {{ schedule.status }}</p></v-col
+							>
+							<v-col
+								><v-btn
+									text
+									color="primary"
+									variant="outlined"
+									@click="deleteDocument(schedule.name)"
+								>
+									Delete
+								</v-btn></v-col
+							>
+						</v-row>
+					</v-container>
+				</v-card></v-row
+			>
+		</v-container>
+
+		<div></div>
 	</div>
 </template>
 
 <script setup>
-import { ref, watch } from 'vue';
-import { doc, setDoc, getFirestore } from 'firebase/firestore';
+import { ref, watch, onMounted } from 'vue';
+import {
+	doc,
+	setDoc,
+	getFirestore,
+	getDocs,
+	query,
+	collection,
+	deleteDoc,
+} from 'firebase/firestore';
 import Datepicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css';
 
@@ -163,6 +211,8 @@ const startDate = ref('');
 const endDate = ref('');
 let selectedEmployee = ref('');
 let selectedSchedule = ref([]);
+let scheduleStatus = ref('');
+let schedules = ref([]);
 const scheduleDates = ref([]); // To store the array of dates
 const employees = ref([
 	{
@@ -1287,10 +1337,31 @@ const employees = ref([
 	},
 ]);
 
+const fetchSchedules = async () => {
+	const querySnap = await getDocs(query(collection(db, 'Schedules')));
+
+	// Clear the schedules array before populating it
+	schedules.value = [];
+	// Add each doc's "name" field to the schedules array
+	querySnap.forEach((doc) => {
+		schedules.value.push(doc.data());
+	});
+};
+
+const deleteDocument = async (id) => {
+	try {
+		await deleteDoc(doc(db, 'Schedules', id));
+		alert(id + ' Deleted!');
+		fetchSchedules();
+	} catch (error) {
+		console.log(error);
+	}
+};
+
 const createSchedule = async () => {
 	//const scheduleTitle = `${startDate.value} - ${endDate.value}`;
 	// Replace 'employees' with your Firestore collection name
-	createDocument()
+	createDocument();
 
 	for (const employee of employees.value) {
 		try {
@@ -1313,27 +1384,34 @@ const createSchedule = async () => {
 	}
 	alert(`New Schedule with end date ${endDate.value} has been made`);
 	cancelNewScheduleDialog();
+	fetchSchedules();
 };
 
 const createDocument = async () => {
-  // Generate a custom document ID or use an existing one
-  const customDocumentID = endDate.value; // Replace 'your_custom_id' with the ID you want to assign
+	// Generate a custom document ID or use an existing one
+	const customDocumentID = endDate.value; // Replace 'your_custom_id' with the ID you want to assign
 
-  try {
-    // Specify the custom document ID when creating the endDate document
-    const endDateDocRef = doc(db, 'Schedules', customDocumentID);
+	try {
+		// Specify the custom document ID when creating the endDate document
+		const endDateDocRef = doc(db, 'Schedules', customDocumentID);
 
-    await setDoc(endDateDocRef, {
-      // Include other data for the endDate document
-      name: endDate.value, // Modify this as needed
-    }, {merge: true});
+		await setDoc(
+			endDateDocRef,
+			{
+				// Include other data for the endDate document
+				name: endDate.value, // Modify this as needed
+				status: scheduleStatus.value,
+			},
+			{ merge: true }
+		);
 
-    console.log(`EndDate document added to Firestore with ID: ${customDocumentID}`);
-  } catch (error) {
-    console.error('Error adding endDate document:', error);
-  }
+		console.log(
+			`EndDate document added to Firestore with ID: ${customDocumentID}`
+		);
+	} catch (error) {
+		console.error('Error adding endDate document:', error);
+	}
 };
-
 
 // Show Employee Schedule Dialog
 const selectEmployee = (employee) => {
@@ -1426,6 +1504,10 @@ const generateDateArray = (start, end) => {
 
 	return dates;
 };
+
+onMounted(() => {
+	fetchSchedules();
+});
 
 const positions = ['OFFICE', 'SCAN', 'CASHIER', 'STOCK'];
 
