@@ -1,13 +1,14 @@
 <template>
-	<div>
-		<div class="d-flex justify-center mt-10">
+	<div class="mt-16 pt-16">
+		<div class="d-flex justify-center ma-10">
 			<v-btn @click="showNewScheduleDialog" color="primary">
 				New Schedule
 			</v-btn>
 		</div>
 
-		<!-- ******* NEW SCHEDULE DIALOG ******* -->
+		<!-- ******* NEW SCHEDULE DIALOG DESKTOP ******* -->
 		<v-dialog
+			class="hidden-sm-and-down"
 			v-model="newScheduleDialog"
 			persistent
 			fullscreen
@@ -29,11 +30,13 @@
 					/>
 				</v-card-text>
 				<v-card-text>
-					<v-container class="border">
+					<v-container>
 						<v-row class="justify-center">
 							<v-col cols="1" class="justify-center">
 								<p>Schedule Status</p>
 								<v-switch
+									color="indigo-darken-3"
+									value="indigo-darken-3"
 									class="justify-center"
 									v-model="scheduleStatus"
 									hide-details
@@ -46,8 +49,8 @@
 					</v-container>
 				</v-card-text>
 
-				<!-- ******* SCHEDULE PREVIEW ******* -->
-				<v-card-text>
+				<!-- ******* SCHEDULE PREVIEW DESKTOP ******* -->
+				<v-card-text class="hidden-sm-and-down">
 					<v-table>
 						<thead>
 							<tr>
@@ -109,7 +112,7 @@
 
 			<!-- ******* EDIT EMPLOYEE SCHEDULE ******* -->
 			<v-dialog v-model="showEmployeeSchedule" width="30%" persistent>
-				<v-card width="80%" class="pa-10 ma-5">
+				<v-card width="80%" class="pa-10 ma-5 hidden-sm-and-down">
 					<v-card-title primary-title>
 						Employee: {{ selectedEmployee }}</v-card-title
 					>
@@ -153,19 +156,207 @@
 			</v-dialog>
 		</v-dialog>
 
-		<!-- Schedule List -->
-		<v-container class="border ma-5 pa-5">
+		<!-- *********************************************************** -->
+
+		<!-- ******* NEW SCHEDULE DIALOG MOBILE ******* -->
+		<v-dialog
+			class="hidden-md-and-up"
+			v-model="newScheduleDialog"
+			persistent
+			fullscreen
+			:scrim="false"
+			transition="dialog-bottom-transition"
+		>
+			<v-card d-flex justify-center align-center>
+				<v-card-title class="text-center" style="color: blue">
+					New Schedule
+				</v-card-title>
+				<v-card-text>
+					<Datepicker
+						class="justify-center"
+						v-model="date"
+						week-picker
+						week-start="0"
+						inline
+						auto-apply
+					/>
+				</v-card-text>
+				<v-card-text>
+					<v-container>
+						<v-row class="justify-center">
+							<v-col cols="6" class="justify-center">
+								<p>Schedule Status</p>
+								<v-switch
+									color="indigo-darken-3"
+									value="indigo-darken-3"
+									class="justify-center"
+									v-model="scheduleStatus"
+									hide-details
+									true-value="Next"
+									false-value="Current"
+									:label="scheduleStatus"
+								></v-switch
+							></v-col>
+						</v-row>
+					</v-container>
+				</v-card-text>
+				<!-- ******* SCHEDULE PREVIEW MOBILE ******* -->
+				<v-card-text>
+					<v-row>
+						<v-col
+							><v-card
+								flat
+								color="transparent"
+								v-for="(scheduleDate, index) in scheduleDates"
+								:key="scheduleDate"
+								width="350px"
+								class="mx-auto"
+							>
+								<v-container class="mb-4">
+									<v-row>
+										<p>{{ days[index] }} - {{ scheduleDate }}</p>
+									</v-row>
+									<v-row
+										v-for="employee in employees"
+										:key="employee"
+										class="border rounded-xl mb-1"
+									>
+										<v-container>
+											<v-row>
+												<v-btn
+													variant="plain"
+													@click="selectEmployee(employee)"
+												>
+													{{ employee.name }}
+												</v-btn>
+												<v-col
+													class="text-caption"
+													v-for="employeeSchedule in employee.schedule"
+													:key="employeeSchedule"
+												>
+													{{ employeeSchedule.time }}
+													<span
+														v-for="position in employeeSchedule.positions"
+														:key="position"
+														class="mr-1"
+													>
+														{{ position }}
+													</span></v-col
+												>
+											</v-row>
+										</v-container>
+									</v-row>
+								</v-container>
+							</v-card></v-col
+						>
+					</v-row>
+				</v-card-text>
+
+				<v-card-actions class="justify-center">
+					<v-btn
+						@click="cancelNewScheduleDialog"
+						color="primary"
+						variant="outlined"
+						elevation="1"
+					>
+						Cancel
+					</v-btn>
+					<v-btn
+						@click="createSchedule"
+						color="primary"
+						variant="outlined"
+						elevation="1"
+					>
+						Create Schedule
+					</v-btn>
+				</v-card-actions>
+			</v-card>
+
+			<!-- ******* EDIT EMPLOYEE SCHEDULE ******* -->
+			<v-dialog v-model="showEmployeeSchedule" width="30%" persistent>
+				<v-card width="80%" class="pa-10 ma-5 hidden-md-and-up">
+					<v-card-title primary-title>
+						Employee: {{ selectedEmployee }}</v-card-title
+					>
+					<v-card-item v-for="schedule in selectedSchedule" :key="schedule">
+						<h4>{{ schedule.day }}</h4>
+						<v-combobox
+							class="pa-2"
+							clearable
+							v-model="schedule.time"
+							chips
+							density="compact"
+							label="Select Time"
+							:items="options"
+							variant="outlined"
+						></v-combobox>
+						<v-combobox
+							class="pa-2"
+							clearable
+							v-model="schedule.positions"
+							multiple
+							chips
+							density="compact"
+							label="Select Positions"
+							:items="positions"
+							variant="outlined"
+						></v-combobox>
+					</v-card-item>
+					<v-card-actions class="justify-center">
+						<v-btn
+							@click="cancelEmployeeSchedule"
+							color="primary"
+							variant="outlined"
+							class="mr-5"
+							>Cancel</v-btn
+						>
+						<v-btn @click="saveEmployeeData" color="primary" variant="outlined"
+							>Save</v-btn
+						>
+					</v-card-actions>
+				</v-card>
+			</v-dialog>
+		</v-dialog>
+
+		<!-- ******* SCHEDULE LIST ******* -->
+		<v-container>
 			<v-row class="justify-center">
 				<h2>Schedules</h2>
 			</v-row>
+			<!-- Desktop View -->
 			<v-row
 				v-for="schedule in schedules"
 				:key="schedule"
-				class="pa-5 mx-10 my-5 justify-center"
+				class="pa-5 mx-10 my-5 justify-center hidden-sm-and-down"
 				><v-card width="30%">
 					<v-container class="border">
 						<v-row>
 							<v-col cols="8"
+								><p>{{ schedule.name }} - {{ schedule.status }}</p></v-col
+							>
+							<v-col
+								><v-btn
+									text
+									color="primary"
+									variant="outlined"
+									@click="deleteDocument(schedule.name)"
+								>
+									Delete
+								</v-btn></v-col
+							>
+						</v-row>
+					</v-container>
+				</v-card></v-row
+			>
+			<!-- Mobile View -->
+			<v-row
+				v-for="schedule in schedules"
+				:key="schedule"
+				class="justify-center hidden-md-and-up"
+				><v-card flat color="transparent" width="350px">
+					<v-container class="border rounded-xl my-3">
+						<v-row>
+							<v-col
 								><p>{{ schedule.name }} - {{ schedule.status }}</p></v-col
 							>
 							<v-col

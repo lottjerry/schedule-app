@@ -1,6 +1,6 @@
 <template>
 	<nav>
-		<v-toolbar app>
+		<v-app-bar app density="compact">
 			<v-app-bar-title class="text-primary">Schedule App</v-app-bar-title>
 
 			<!-- dropdown menu -->
@@ -25,7 +25,7 @@
 					</v-list-item>
 				</v-list>
 			</v-menu>
-		</v-toolbar>
+		</v-app-bar>
 		<router-view></router-view>
 	</nav>
 </template>

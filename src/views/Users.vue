@@ -1,5 +1,5 @@
 <template>
-	<div>
+	<div class="mt-16 pt-16">
 		<div class="d-flex justify-center mt-10">
 			<!-- New User Button -->
 			<v-btn @click="showNewUserDialog" color="primary"> New User </v-btn>

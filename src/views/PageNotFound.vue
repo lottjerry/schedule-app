@@ -1,5 +1,5 @@
 <template>
-	<div>
+	<div class="mt-16 pt-16">
 		<v-container class="text-center" v-if="isLoggedIn">
 			<v-card class="pa-3">
 				<v-img src="https://i.gifer.com/XOsX.gif" max-height="500"></v-img>

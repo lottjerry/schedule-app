@@ -1,5 +1,5 @@
 <template>
-	<div class="d-flex flex-column align-center justify-center mt-5">
+	<div class="d-flex flex-column align-center justify-center mt-16 pt-16">
 		<v-icon icon="mdi-home-outline" size="40" color="primary"></v-icon>
 		<h1 class="text-primary text-h4 font-weight-bold pa-2">Log in</h1>
 	</div>

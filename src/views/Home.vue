@@ -1,10 +1,10 @@
 <template>
-	<div>
-		<v-container class="mb-10">
+	<div class="mt-16 pt-16">
+		<v-container class="mb-16">
 			<v-row class="justify-center pa-10">
 				<h1 class="text-primary">Schedules</h1>
 			</v-row>
-			<v-row
+			<v-row class="justify-center pa-5"
 				><v-btn
 					variant="outlined"
 					@click="fetchData"
@@ -14,7 +14,7 @@
 				</v-btn></v-row
 			>
 			<v-row class="justify-center pa-10">
-				<v-col cols="2">
+				<v-col lg="2" md="2" sm="4">
 					<v-select
 						color="primary"
 						label="Select"
@@ -31,8 +31,8 @@
 				</v-col>
 			</v-row>
 
-			<!-- ******* SCHEDULES VIEW ******* -->
-			<v-row>
+			<!-- ******* SCHEDULES VIEW DESKTOP ******* -->
+			<v-row class="hidden-sm-and-down justify-center">
 				<v-table>
 					<thead>
 						<tr>
@@ -41,7 +41,7 @@
 								class="text-left border"
 								v-for="date in dates"
 								:key="date"
-								:class="{ 'text-primary custom_border': isToday(date) }"
+								:class="{ 'text-indigo-darken-3 custom_border': isToday(date) }"
 							>
 								{{ date }}
 							</th>
@@ -49,7 +49,7 @@
 						<tr>
 							<th v-if="selectedSchedule" class="text-left border"></th>
 							<th class="text-left border" v-for="day in days" :key="day">
-								<h2 class="pa-2" >{{ day }}</h2>
+								<h2 class="pa-2">{{ day }}</h2>
 							</th>
 						</tr>
 					</thead>
@@ -67,7 +67,6 @@
 							>
 								<div class="pa-5">
 									<h4>{{ employeeSchedule.time }}</h4>
-
 									<h4
 										v-for="position in employeeSchedule.positions"
 										:key="position"
@@ -80,6 +79,51 @@
 						</tr>
 					</tbody>
 				</v-table>
+			</v-row>
+			<!-- ******* SCHEDULES VIEW MOBILE DEVICES ******* -->
+			<v-row v-if="selectedSchedule" class="hidden-md-and-up">
+				<v-col
+					><v-card
+						flat
+						color="transparent"
+						v-for="(date, index) in dates"
+						:key="date"
+						width="350px"
+						class="mx-auto"
+						:class="{ 'text-indigo-darken-3 custom_border': isToday(date) }"
+					>
+						<v-container class="mb-4">
+							<v-row>
+								<p>{{ days[index] }} - {{ date }}</p>
+							</v-row>
+							<v-row
+								v-for="schedule in schedules"
+								:key="schedule"
+								class="border rounded-xl mb-1"
+							>
+								<v-container>
+									<v-row>
+										<v-col class="text-caption">{{ schedule.name }}</v-col>
+										<v-col
+											class="text-caption"
+											v-for="employeeSchedule in schedule.schedule"
+											:key="employeeSchedule"
+										>
+											{{ employeeSchedule.time }}
+											<span
+												v-for="position in employeeSchedule.positions"
+												:key="position"
+												class="mr-1"
+											>
+												{{ position }}
+											</span></v-col
+										>
+									</v-row>
+								</v-container>
+							</v-row>
+						</v-container>
+					</v-card></v-col
+				>
 			</v-row>
 		</v-container>
 	</div>
@@ -271,9 +315,9 @@ const days = [
 ];
 </script>
 
-<style sc>
+<style scoped>
 .custom_border {
-	border-color: #6200EE !important;
+	border-color: #283593 !important;
 	border-width: 3px !important;
 }
 </style>
