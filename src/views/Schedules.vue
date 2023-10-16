@@ -111,7 +111,12 @@
 			</v-card>
 
 			<!-- ******* EDIT EMPLOYEE SCHEDULE DESKTOP ******* -->
-			<v-dialog v-model="showEmployeeSchedule" width="30%" persistent class="hidden-sm-and-down">
+			<v-dialog
+				v-model="showEmployeeSchedule"
+				width="30%"
+				persistent
+				class="hidden-sm-and-down"
+			>
 				<v-card width="80%" class="pa-10 ma-5">
 					<v-card-title primary-title>
 						Employee: {{ selectedEmployee }}</v-card-title
@@ -248,26 +253,39 @@
 									>
 										<v-container>
 											<v-row>
-												<v-btn
-													variant="plain"
-													@click="selectEmployee(employee)"
+												<v-col cols="5"
+													><v-btn
+														variant="plain"
+														class="text-caption"
+														@click="selectEmployee(employee)"
+													>
+														{{ employee.name }}
+													</v-btn></v-col
 												>
-													{{ employee.name }}
-												</v-btn>
-												<v-col
+												<div
 													class="text-caption"
 													v-for="employeeSchedule in employee.schedule"
-													:key="employeeSchedule"
+													:key="employeeSchedule.day"
 												>
-													{{ employeeSchedule.time }}
-													<span
-														v-for="position in employeeSchedule.positions"
-														:key="position"
-														class="mr-1"
+													<div
+														v-if="
+															employeeSchedule.day.toLowerCase() ===
+															days[index].toLowerCase()
+														"
+														class="pa-2 text-center"
 													>
-														{{ position }}
-													</span></v-col
-												>
+														<p>
+															{{ employeeSchedule.time }}
+														</p>
+														<p
+															v-for="position in employeeSchedule.positions"
+															:key="position"
+															class="mr-1"
+														>
+															{{ position }}
+														</p>
+													</div>
+												</div>
 											</v-row>
 										</v-container>
 									</v-row>
@@ -276,12 +294,14 @@
 						>
 					</v-row>
 				</v-card-text>
-
-			
 			</v-card>
 
 			<!-- ******* EDIT EMPLOYEE SCHEDULE MOBILE ******* -->
-			<v-dialog v-model="showEmployeeSchedule" persistent class="hidden-md-and-up">
+			<v-dialog
+				v-model="showEmployeeSchedule"
+				persistent
+				class="hidden-md-and-up"
+			>
 				<v-card>
 					<v-card-title primary-title>
 						Employee: {{ selectedEmployee }}</v-card-title

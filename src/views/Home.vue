@@ -64,7 +64,6 @@
 								v-for="employeeSchedule in schedule.schedule"
 								:key="employeeSchedule"
 								class="border"
-								
 							>
 								<div class="pa-5">
 									<h4>{{ employeeSchedule.time }}</h4>
@@ -104,24 +103,25 @@
 							>
 								<v-container>
 									<v-row>
-										<v-col class="text-caption">{{ schedule.name }}</v-col>
-										<v-col
+										<v-col cols="5" class="text-caption">{{ schedule.name }}</v-col>
+										<div
 											class="text-caption"
 											v-for="employeeSchedule in schedule.schedule"
-											:key="employeeSchedule"
+											:key="employeeSchedule.day"
 										>
-										<div>
-											{{ employeeSchedule.time }}
+											<div v-if="employeeSchedule.day.toLowerCase() === days[index].toLowerCase()" class="pa-2 text-center">
+												<p>
+													{{ employeeSchedule.time }}
+												</p>
+												<p
+													v-for="position in employeeSchedule.positions"
+													:key="position"
+													class="mr-1"
+												>
+													{{ position }}
+												</p>
+											</div>
 										</div>
-											
-											<span
-												v-for="position in employeeSchedule.positions"
-												:key="position"
-												class="mr-1"
-											>
-												{{ position }}
-											</span></v-col
-										>
 									</v-row>
 								</v-container>
 							</v-row>
