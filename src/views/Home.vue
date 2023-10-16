@@ -64,6 +64,7 @@
 								v-for="employeeSchedule in schedule.schedule"
 								:key="employeeSchedule"
 								class="border"
+								
 							>
 								<div class="pa-5">
 									<h4>{{ employeeSchedule.time }}</h4>
@@ -109,7 +110,10 @@
 											v-for="employeeSchedule in schedule.schedule"
 											:key="employeeSchedule"
 										>
+										<div>
 											{{ employeeSchedule.time }}
+										</div>
+											
 											<span
 												v-for="position in employeeSchedule.positions"
 												:key="position"

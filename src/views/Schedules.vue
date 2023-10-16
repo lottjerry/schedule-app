@@ -110,9 +110,9 @@
 				</v-card-actions>
 			</v-card>
 
-			<!-- ******* EDIT EMPLOYEE SCHEDULE ******* -->
-			<v-dialog v-model="showEmployeeSchedule" width="30%" persistent>
-				<v-card width="80%" class="pa-10 ma-5 hidden-sm-and-down">
+			<!-- ******* EDIT EMPLOYEE SCHEDULE DESKTOP ******* -->
+			<v-dialog v-model="showEmployeeSchedule" width="30%" persistent class="hidden-sm-and-down">
+				<v-card width="80%" class="pa-10 ma-5">
 					<v-card-title primary-title>
 						Employee: {{ selectedEmployee }}</v-card-title
 					>
@@ -167,13 +167,38 @@
 			:scrim="false"
 			transition="dialog-bottom-transition"
 		>
-			<v-card d-flex justify-center align-center>
-				<v-card-title class="text-center" style="color: blue">
+			<v-app-bar density="compact" class="custom_margin">
+				<v-app-bar-title class="text-primary text-button">
 					New Schedule
-				</v-card-title>
+				</v-app-bar-title>
+				<div>
+					<v-btn
+						@click="cancelNewScheduleDialog"
+						color="primary"
+						variant="outlined"
+						elevation="1"
+						class="text-caption ma-1"
+						density="compact"
+					>
+						Cancel
+					</v-btn>
+					<v-btn
+						@click="createSchedule"
+						color="primary"
+						variant="outlined"
+						elevation="1"
+						class="text-caption ma-1"
+						density="compact"
+					>
+						Create Schedule
+					</v-btn>
+				</div>
+			</v-app-bar>
+
+			<v-card d-flex justify-center align-center>
 				<v-card-text>
 					<Datepicker
-						class="justify-center"
+						class="justify-center pt-16 mt-16"
 						v-model="date"
 						week-picker
 						week-start="0"
@@ -252,29 +277,12 @@
 					</v-row>
 				</v-card-text>
 
-				<v-card-actions class="justify-center">
-					<v-btn
-						@click="cancelNewScheduleDialog"
-						color="primary"
-						variant="outlined"
-						elevation="1"
-					>
-						Cancel
-					</v-btn>
-					<v-btn
-						@click="createSchedule"
-						color="primary"
-						variant="outlined"
-						elevation="1"
-					>
-						Create Schedule
-					</v-btn>
-				</v-card-actions>
+			
 			</v-card>
 
-			<!-- ******* EDIT EMPLOYEE SCHEDULE ******* -->
-			<v-dialog v-model="showEmployeeSchedule" width="30%" persistent>
-				<v-card width="80%" class="pa-10 ma-5 hidden-md-and-up">
+			<!-- ******* EDIT EMPLOYEE SCHEDULE MOBILE ******* -->
+			<v-dialog v-model="showEmployeeSchedule" persistent class="hidden-md-and-up">
+				<v-card>
 					<v-card-title primary-title>
 						Employee: {{ selectedEmployee }}</v-card-title
 					>
@@ -1731,4 +1739,8 @@ const options = [
 ];
 </script>
 
-<style></style>
+<style scoped>
+.custom_margin {
+	margin-top: -13%;
+}
+</style>
