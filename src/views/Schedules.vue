@@ -1,5 +1,12 @@
 <template>
 	<div class="mt-16 pt-16">
+		<v-overlay :model-value="isLoading" class="align-center justify-center">
+			<v-progress-circular
+				color="primary"
+				indeterminate
+				size="64"
+			></v-progress-circular>
+		</v-overlay>
 		<div class="d-flex justify-center ma-10">
 			<v-btn @click="showNewScheduleDialog" color="primary">
 				New Schedule
@@ -15,6 +22,29 @@
 			:scrim="false"
 			transition="dialog-bottom-transition"
 		>
+			<v-app-bar density="compact" class="custom_margin2">
+				<v-app-bar-title class="text-primary"> New Schedule </v-app-bar-title>
+				<div>
+					<v-btn
+						@click="cancelNewScheduleDialog"
+						color="primary"
+						variant="outlined"
+						elevation="1"
+						class="ma-1"
+					>
+						Cancel
+					</v-btn>
+					<v-btn
+						@click="createSchedule"
+						color="primary"
+						variant="outlined"
+						elevation="1"
+						class="ma-1"
+					>
+						Create Schedule
+					</v-btn>
+				</div>
+			</v-app-bar>
 			<v-card d-flex justify-center align-center class="pa-16">
 				<v-card-title class="text-center" style="color: blue">
 					New Schedule
@@ -89,25 +119,6 @@
 						</tbody>
 					</v-table>
 				</v-card-text>
-
-				<v-card-actions class="justify-center">
-					<v-btn
-						@click="cancelNewScheduleDialog"
-						color="primary"
-						variant="outlined"
-						elevation="1"
-					>
-						Cancel
-					</v-btn>
-					<v-btn
-						@click="createSchedule"
-						color="primary"
-						variant="outlined"
-						elevation="1"
-					>
-						Create Schedule
-					</v-btn>
-				</v-card-actions>
 			</v-card>
 
 			<!-- ******* EDIT EMPLOYEE SCHEDULE DESKTOP ******* -->
@@ -422,7 +433,7 @@ import Datepicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css';
 
 const db = getFirestore();
-
+const isLoading = ref(false);
 const newScheduleDialog = ref(false);
 const showEmployeeSchedule = ref(false);
 const date = ref('');
@@ -1557,6 +1568,7 @@ const employees = ref([
 ]);
 
 const fetchSchedules = async () => {
+	isLoading.value = true;
 	const querySnap = await getDocs(query(collection(db, 'Schedules')));
 
 	// Clear the schedules array before populating it
@@ -1565,14 +1577,18 @@ const fetchSchedules = async () => {
 	querySnap.forEach((doc) => {
 		schedules.value.push(doc.data());
 	});
+	isLoading.value = false;
 };
 
 const deleteDocument = async (id) => {
+	isLoading.value = true;
 	try {
 		await deleteDoc(doc(db, 'Schedules', id));
+		isLoading.value = false;
 		alert(id + ' Deleted!');
 		fetchSchedules();
 	} catch (error) {
+		isLoading.value = false;
 		console.log(error);
 	}
 };
@@ -1580,6 +1596,7 @@ const deleteDocument = async (id) => {
 const createSchedule = async () => {
 	//const scheduleTitle = `${startDate.value} - ${endDate.value}`;
 	// Replace 'employees' with your Firestore collection name
+	isLoading.value = true;
 	createDocument();
 
 	for (const employee of employees.value) {
@@ -1596,11 +1613,12 @@ const createSchedule = async () => {
 				},
 				{ merge: true }
 			);
-			console.log(`Employee ${employee.name} added to Firestore`);
 		} catch (error) {
+			isLoading.value = false;
 			console.error(`Error adding employee ${employee.name}:`, error);
 		}
 	}
+	isLoading.value = false;
 	alert(`New Schedule with end date ${endDate.value} has been made`);
 	cancelNewScheduleDialog();
 	fetchSchedules();
@@ -1625,7 +1643,7 @@ const createDocument = async () => {
 		);
 
 		console.log(
-			`EndDate document added to Firestore with ID: ${customDocumentID}`
+			(isLoading.value = false`EndDate document added to Firestore with ID: ${customDocumentID}`)
 		);
 	} catch (error) {
 		console.error('Error adding endDate document:', error);
@@ -1634,24 +1652,28 @@ const createDocument = async () => {
 
 // Show Employee Schedule Dialog
 const selectEmployee = (employee) => {
+	isLoading.value = true;
 	selectedEmployee.value = employee.name;
 	selectedSchedule.value = employee.schedule;
 	showEmployeeSchedule.value = true;
+	isLoading.value = false;
 };
 
 // Clear Employee Schedule Data
 const clearEmployeeData = () => {
+	isLoading.value = true;
 	for (let employee of employees.value) {
 		for (let schedule of employee.schedule) {
 			schedule.time = null;
 			schedule.positions = [];
 		}
 	}
+	isLoading.value = false;
 };
 
 // Save Employee Data
 const saveEmployeeData = () => (showEmployeeSchedule.value = false);
-
+isLoading.value = true;
 // Cancel Employee Schedule Dialog
 const cancelEmployeeSchedule = () => {
 	// Clear the selected employee's time and positions
@@ -1668,6 +1690,7 @@ const cancelEmployeeSchedule = () => {
 			}
 		}
 	}
+	isLoading.value = false;
 	showEmployeeSchedule.value = false;
 };
 
@@ -1762,5 +1785,9 @@ const options = [
 <style scoped>
 .custom_margin {
 	margin-top: -13%;
+}
+
+.custom_margin2 {
+	margin-top: -2.5%;
 }
 </style>

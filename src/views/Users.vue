@@ -1,5 +1,12 @@
 <template>
 	<div class="mt-16 pt-16">
+		<v-overlay :model-value="isLoading" class="align-center justify-center">
+			<v-progress-circular
+				color="primary"
+				indeterminate
+				size="64"
+			></v-progress-circular>
+		</v-overlay>
 		<div class="d-flex justify-center mt-10">
 			<!-- New User Button -->
 			<v-btn @click="showNewUserDialog" color="primary"> New User </v-btn>
@@ -114,7 +121,9 @@
 		<v-card width="350px" class="mx-auto hidden-md-and-up mt-5">
 			<v-col v-for="user in users" :key="user.id">
 				<v-card class="pa-8">
-					<v-card-title class="text-center">{{ user.firstName }} {{ user.lastName }}</v-card-title>
+					<v-card-title class="text-center"
+						>{{ user.firstName }} {{ user.lastName }}</v-card-title
+					>
 					<v-card-text class="text-center">
 						<div>Position: {{ user.position }}</div>
 						<div>Role: {{ user.role }}</div>
@@ -214,7 +223,7 @@ import {
 	getAuth,
 	createUserWithEmailAndPassword,
 	sendPasswordResetEmail,
-	signOut
+	signOut,
 } from 'firebase/auth';
 import {
 	getFirestore,
@@ -226,6 +235,7 @@ import {
 	updateDoc,
 } from 'firebase/firestore';
 
+const isLoading = ref(false);
 const router = useRouter();
 const email = ref('');
 const password = ref('');
@@ -247,16 +257,19 @@ let editUserId = null;
 
 // Fetch Users
 const fetchUsers = async () => {
+	isLoading.value = true;
 	const querySnapshot = await getDocs(collection(db, 'users'));
 	const usersData = [];
 	querySnapshot.forEach((doc) => {
 		usersData.push({ ...doc.data(), id: doc.id });
 	});
 	users.value = usersData;
+	isLoading.value = false;
 };
 
 // Create User
 const createUser = () => {
+	isLoading.value = true;
 	createUserWithEmailAndPassword(getAuth(), email.value, password.value)
 		.then((userCredentials) => {
 			const newUser = {
@@ -269,8 +282,10 @@ const createUser = () => {
 
 			setDoc(doc(db, 'users', userCredentials.user.uid), newUser)
 				.then(() => {
+					isLoading.value = true;
 					alert(`Successfully created user ${firstName.value}`);
-					logout()
+					isLoading.value = false;
+					logout();
 					firstName.value = '';
 					lastName.value = '';
 					position.value = '';
@@ -281,10 +296,12 @@ const createUser = () => {
 					fetchUsers(); // Fetch updated user list
 				})
 				.catch((error) => {
+					isLoading.value = false;
 					errMsg.value = `Error adding user to database: ${error.message}`;
 				});
 		})
 		.catch((error) => {
+			isLoading.value = false;
 			errMsg.value = `Error creating user: ${error.message}`;
 		});
 };
@@ -301,13 +318,16 @@ const cancelNewUserDialog = () => {
 
 // Delete User
 const deleteUser = (user) => {
+	isLoading.value = true;
 	const userRef = doc(db, 'users', user.id);
 	deleteDoc(userRef)
 		.then(() => {
+			isLoading.value = false;
 			alert(`Successfully deleted user ${user.firstName}`);
 			fetchUsers(); // Fetch updated user list
 		})
 		.catch((error) => {
+			isLoading.value = false;
 			errMsg.value = `Error deleting user: ${error.message}`;
 		});
 };
@@ -324,6 +344,7 @@ const editUser = (user) => {
 
 // Update User
 const updateUser = () => {
+	isLoading.value = true;
 	if (editUserId) {
 		const userRef = doc(db, 'users', editUserId);
 		updateDoc(userRef, {
@@ -333,6 +354,7 @@ const updateUser = () => {
 			email: editEmail.value,
 		})
 			.then(() => {
+				isLoading.value = false;
 				alert(`Successfully updated user ${editFirstName.value}`);
 				editUserId = null;
 				editFirstName.value = '';
@@ -343,6 +365,7 @@ const updateUser = () => {
 				fetchUsers(); // Fetch updated user list
 			})
 			.catch((error) => {
+				isLoading.value = false;
 				editErrMsg.value = `Error updating user: ${error.message}`;
 			});
 	}
@@ -360,29 +383,30 @@ const cancelEditUserDialog = () => {
 
 // Reset Password
 const resetPassword = (user) => {
+	isLoading.value = true;
 	const auth = getAuth();
 	const email = user.email;
 
 	sendPasswordResetEmail(auth, email)
 		.then(() => {
+			isLoading.value = false;
 			alert(`Reset password email sent to ${email}`);
 		})
 		.catch((error) => {
+			isLoading.value = false;
 			errMsg.value = `Error resetting password: ${error.message}`;
 		});
 };
 
 const logout = async () => {
-	const auth = getAuth()
-			try {
-				await signOut(auth);
-				router.push('/');
-			} catch (error) {
-				console.error(error);
-			}
-		};
-
-
+	const auth = getAuth();
+	try {
+		await signOut(auth);
+		router.push('/');
+	} catch (error) {
+		console.error(error);
+	}
+};
 
 // Fetch users on component mount
 onMounted(fetchUsers);

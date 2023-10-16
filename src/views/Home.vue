@@ -1,5 +1,12 @@
 <template>
 	<div class="mt-16 pt-16">
+		<v-overlay :model-value="isLoading" class="align-center justify-center">
+			<v-progress-circular
+				color="primary"
+				indeterminate
+				size="64"
+			></v-progress-circular>
+		</v-overlay>
 		<v-container class="mb-16">
 			<v-row class="justify-center pa-10">
 				<h1 class="text-primary">Schedules</h1>
@@ -103,13 +110,21 @@
 							>
 								<v-container>
 									<v-row>
-										<v-col cols="5" class="text-caption">{{ schedule.name }}</v-col>
+										<v-col cols="5" class="text-caption">{{
+											schedule.name
+										}}</v-col>
 										<div
 											class="text-caption"
 											v-for="employeeSchedule in schedule.schedule"
 											:key="employeeSchedule.day"
 										>
-											<div v-if="employeeSchedule.day.toLowerCase() === days[index].toLowerCase()" class="pa-2 text-center">
+											<div
+												v-if="
+													employeeSchedule.day.toLowerCase() ===
+													days[index].toLowerCase()
+												"
+												class="pa-2 text-center"
+											>
 												<p>
 													{{ employeeSchedule.time }}
 												</p>
@@ -147,10 +162,12 @@ let schedules = ref([]);
 let dates = ref([]);
 let name = ref('');
 let status = ref('');
+const isLoading = ref(false);
 const buttonDisabled = ref(false);
 let selectedSchedule = ref(); // To store the selected value
 
 const saveDataToSession = () => {
+	isLoading.value = true;
 	sessionStorage.setItem('schedulesID', JSON.stringify(schedulesID.value));
 	sessionStorage.setItem(
 		'scheduleStatus',
@@ -161,9 +178,11 @@ const saveDataToSession = () => {
 		JSON.stringify(currentSchedule.value)
 	);
 	sessionStorage.setItem('nextSchedule', JSON.stringify(nextSchedule.value));
+	isLoading.value = false;
 };
 
 const loadDataFromSession = () => {
+	isLoading.value = true;
 	const storedSchedulesID = sessionStorage.getItem('schedulesID');
 	const storedScheduleStatus = sessionStorage.getItem('scheduleStatus');
 	const storedCurrentSchedule = sessionStorage.getItem('currentSchedule');
@@ -181,10 +200,12 @@ const loadDataFromSession = () => {
 	if (storedNextSchedule) {
 		nextSchedule.value = JSON.parse(storedNextSchedule);
 	}
+	isLoading.value = false;
 };
 
 // Current Problem: Fetch Schedule IDs but not the actual schedule data. Have to click Fetch Data Button Twice
 const fetchData = async () => {
+	isLoading.value = true;
 	try {
 		await fetchSchedulesID();
 		await fetchCurrentSchedule();
@@ -196,6 +217,7 @@ const fetchData = async () => {
 	} catch (error) {
 		console.error('An error occurred: ', error);
 	}
+	isLoading.value = false;
 };
 
 // You should have two functions that return Promises, fetchSchedulesID and fetchSchedules.
