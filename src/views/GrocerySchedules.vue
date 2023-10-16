@@ -9,7 +9,7 @@
 		</v-overlay>
 		<v-container class="mb-16">
 			<v-row class="justify-center pa-10">
-				<h1 class="text-primary">My Schedule</h1>
+				<h1 class="text-primary">Grocery Schedules</h1>
 			</v-row>
 			<v-row class="justify-center pa-5"
 				><v-btn

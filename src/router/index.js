@@ -4,6 +4,7 @@ import Home from '@/views/Home';
 import Users from '@/views/Users';
 import Schedules from '@/views/Schedules';
 import PageNotFound from '@/views/PageNotFound';
+import GrocerySchedules from '@/views/GrocerySchedules';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { getFirestore, doc, getDoc } from 'firebase/firestore';
 
@@ -22,6 +23,16 @@ const routes = [
 			requiresAuth: true,
 		},
 	},
+
+	{
+		path: '/grocery_schedules',
+		name: 'grocery_schedules',
+		component: GrocerySchedules,
+		meta: {
+			requiresAuth: true,
+		},
+	},
+
 	{
 		path: '/users',
 		name: 'users',

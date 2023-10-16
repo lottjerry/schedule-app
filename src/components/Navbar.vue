@@ -6,13 +6,18 @@
 			<!-- dropdown menu -->
 			<v-menu location="bottom" v-if="isLoggedIn">
 				<template v-slot:activator="{ props }">
-					<v-btn variant="tonal" v-bind="props" color="primary">{{ user_firstName }}</v-btn>
+					<v-btn variant="tonal" v-bind="props" color="primary">{{
+						user_firstName
+					}}</v-btn>
 				</template>
 				<v-list color="primary">
+					<v-list-item to="/home">
+						<v-list-item-title>My Schedule</v-list-item-title>
+					</v-list-item>
+					<v-list-item to="/grocery_schedules">
+						<v-list-item-title>Grocery Schedules</v-list-item-title>
+					</v-list-item>
 					<div v-if="user_role === 'admin'">
-						<v-list-item to="/home">
-							<v-list-item-title>Home</v-list-item-title>
-						</v-list-item>
 						<v-list-item to="/users">
 							<v-list-item-title>Users</v-list-item-title>
 						</v-list-item>
@@ -20,6 +25,7 @@
 							<v-list-item-title>Schedules</v-list-item-title>
 						</v-list-item>
 					</div>
+
 					<v-list-item @click="logout">
 						<v-list-item-title>Log out</v-list-item-title>
 					</v-list-item>
