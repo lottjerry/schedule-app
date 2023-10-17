@@ -1784,7 +1784,7 @@ const options = [
 
 <style scoped>
 .custom_margin {
-	margin-top: -13%;
+	margin-top: -25%;
 }
 
 .custom_margin2 {

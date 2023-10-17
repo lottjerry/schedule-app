@@ -26,7 +26,7 @@
 						color="primary"
 						label="Select"
 						:hint="`${name} - ${status}`"
-						:items="schedulesID"
+						:items="employeeSchedulesID"
 						item-title="status"
 						item-value="name"
 						v-model="selectedSchedule"
@@ -150,14 +150,14 @@
 
 <script setup>
 import { ref, watch, onMounted } from 'vue';
-import { getFirestore, query, collection, getDocs } from 'firebase/firestore';
+import { getFirestore, query, collection, getDocs, where } from 'firebase/firestore';
 
 const db = getFirestore();
 
-let currentSchedule = ref([]);
-let nextSchedule = ref([]);
-let schedulesID = ref([]);
-let scheduleStatus = ref([]);
+let currentEmployeeSchedule = ref([]);
+let employeeNextSchedule = ref([]);
+let employeeSchedulesID = ref([]);
+let employeeScheduleStatus = ref([]);
 let schedules = ref([]);
 let dates = ref([]);
 let name = ref('');
@@ -168,37 +168,37 @@ let selectedSchedule = ref(); // To store the selected value
 
 const saveDataToSession = () => {
 	isLoading.value = true;
-	sessionStorage.setItem('schedulesID', JSON.stringify(schedulesID.value));
+	sessionStorage.setItem('employeeSchedulesID', JSON.stringify(employeeSchedulesID.value));
 	sessionStorage.setItem(
-		'scheduleStatus',
-		JSON.stringify(scheduleStatus.value)
+		'employeeScheduleStatus',
+		JSON.stringify(employeeScheduleStatus.value)
 	);
 	sessionStorage.setItem(
-		'currentSchedule',
-		JSON.stringify(currentSchedule.value)
+		'currentEmployeeSchedule',
+		JSON.stringify(currentEmployeeSchedule.value)
 	);
-	sessionStorage.setItem('nextSchedule', JSON.stringify(nextSchedule.value));
+	sessionStorage.setItem('employeeNextSchedule', JSON.stringify(employeeNextSchedule.value));
 	isLoading.value = false;
 };
 
 const loadDataFromSession = () => {
 	isLoading.value = true;
-	const storedSchedulesID = sessionStorage.getItem('schedulesID');
-	const storedScheduleStatus = sessionStorage.getItem('scheduleStatus');
-	const storedCurrentSchedule = sessionStorage.getItem('currentSchedule');
-	const storedNextSchedule = sessionStorage.getItem('nextSchedule');
+	const storedemployeeSchedulesID = sessionStorage.getItem('employeeSchedulesID');
+	const storedemployeeScheduleStatus = sessionStorage.getItem('employeeScheduleStatus');
+	const storedcurrentEmployeeSchedule = sessionStorage.getItem('currentEmployeeSchedule');
+	const storedemployeeNextSchedule = sessionStorage.getItem('employeeNextSchedule');
 
-	if (storedSchedulesID) {
-		schedulesID.value = JSON.parse(storedSchedulesID);
+	if (storedemployeeSchedulesID) {
+		employeeSchedulesID.value = JSON.parse(storedemployeeSchedulesID);
 	}
-	if (storedScheduleStatus) {
-		scheduleStatus.value = JSON.parse(storedScheduleStatus);
+	if (storedemployeeScheduleStatus) {
+		employeeScheduleStatus.value = JSON.parse(storedemployeeScheduleStatus);
 	}
-	if (storedCurrentSchedule) {
-		currentSchedule.value = JSON.parse(storedCurrentSchedule);
+	if (storedcurrentEmployeeSchedule) {
+		currentEmployeeSchedule.value = JSON.parse(storedcurrentEmployeeSchedule);
 	}
-	if (storedNextSchedule) {
-		nextSchedule.value = JSON.parse(storedNextSchedule);
+	if (storedemployeeNextSchedule) {
+		employeeNextSchedule.value = JSON.parse(storedemployeeNextSchedule);
 	}
 	isLoading.value = false;
 };
@@ -207,9 +207,9 @@ const loadDataFromSession = () => {
 const fetchData = async () => {
 	isLoading.value = true;
 	try {
-		await fetchSchedulesID();
-		await fetchCurrentSchedule();
-		await fetchNextSchedule();
+		await fetchemployeeSchedulesID();
+		await fetchcurrentEmployeeSchedule();
+		await fetchemployeeNextSchedule();
 		alert('Data Fetched');
 
 		// Save the data to session storage
@@ -220,48 +220,48 @@ const fetchData = async () => {
 	isLoading.value = false;
 };
 
-// You should have two functions that return Promises, fetchSchedulesID and fetchSchedules.
+// You should have two functions that return Promises, fetchemployeeSchedulesID and fetchSchedules.
 
-const fetchSchedulesID = async () => {
+const fetchemployeeSchedulesID = async () => {
 	const querySnap = await getDocs(query(collection(db, 'Schedules')));
 
 	// Clear the schedules array before populating it
-	schedulesID.value = [];
+	employeeSchedulesID.value = [];
 	// Add each doc's "name" field to the schedules array
 	querySnap.forEach((doc) => {
-		schedulesID.value.push(doc.data());
-		scheduleStatus.value.push(doc.data().status);
+		employeeSchedulesID.value.push(doc.data());
+		employeeScheduleStatus.value.push(doc.data().status);
 	});
 };
 
-const fetchNextSchedule = async () => {
+const fetchemployeeNextSchedule = async () => {
 	const querySnap = await getDocs(
 		query(
 			collection(
 				db,
 				'Schedules',
-				schedulesID.value[0].name,
-				schedulesID.value[0].name
-			)
+				employeeSchedulesID.value[0].name,
+				employeeSchedulesID.value[0].name,
+			), where('name', '==', 'ALISON')
 		)
 	);
 	querySnap.forEach((doc) => {
-		nextSchedule.value.push(doc.data());
+		employeeNextSchedule.value.push(doc.data());
 	});
 };
-const fetchCurrentSchedule = async () => {
+const fetchcurrentEmployeeSchedule = async () => {
 	const querySnap = await getDocs(
 		query(
 			collection(
 				db,
 				'Schedules',
-				schedulesID.value[1].name,
-				schedulesID.value[1].name
-			)
+				employeeSchedulesID.value[1].name,
+				employeeSchedulesID.value[1].name
+			), where('name', '==', 'ALISON')
 		)
 	);
 	querySnap.forEach((doc) => {
-		currentSchedule.value.push(doc.data());
+		currentEmployeeSchedule.value.push(doc.data());
 	});
 };
 
@@ -310,15 +310,15 @@ const isToday = (date) => {
 watch(selectedSchedule, (newValue) => {
 	generateDateArray();
 
-	if (newValue === schedulesID.value[0]) {
-		schedules.value = nextSchedule.value;
+	if (newValue === employeeSchedulesID.value[0]) {
+		schedules.value = employeeNextSchedule.value;
 	} else {
-		schedules.value = currentSchedule.value;
+		schedules.value = currentEmployeeSchedule.value;
 	}
 });
 
-watch(schedulesID, () => {
-	if (schedulesID.value) {
+watch(employeeSchedulesID, () => {
+	if (employeeSchedulesID.value) {
 		buttonDisabled.value = true;
 	} else {
 		buttonDisabled.value = false;
