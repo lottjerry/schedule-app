@@ -428,6 +428,7 @@ import {
 	query,
 	collection,
 	deleteDoc,
+  serverTimestamp,
 } from 'firebase/firestore';
 import Datepicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css';
@@ -1638,6 +1639,7 @@ const createDocument = async () => {
 				// Include other data for the endDate document
 				name: endDate.value, // Modify this as needed
 				status: scheduleStatus.value,
+				createdAt: serverTimestamp()
 			},
 			{ merge: true }
 		);
