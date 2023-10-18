@@ -37,7 +37,7 @@
 					></v-select>
 				</v-col>
 			</v-row>
-
+			<v-row class="justify-center pa-3"> Updated @ {{ updatedAt }} </v-row>
 			<!-- ******* SCHEDULES VIEW DESKTOP ******* -->
 			<v-row class="hidden-sm-and-down justify-center">
 				<v-table>
@@ -158,7 +158,9 @@ let currentSchedule = ref([]);
 let nextSchedule = ref([]);
 let schedulesID = ref([]);
 let scheduleStatus = ref([]);
+let scheduleUpdate = ref([]);
 let schedules = ref([]);
+let updatedAt = ref();
 let dates = ref([]);
 let name = ref('');
 let status = ref('');
@@ -174,6 +176,10 @@ const saveDataToSession = () => {
 		JSON.stringify(scheduleStatus.value)
 	);
 	sessionStorage.setItem(
+		'scheduleUpdate',
+		JSON.stringify(scheduleUpdate.value)
+	);
+	sessionStorage.setItem(
 		'currentSchedule',
 		JSON.stringify(currentSchedule.value)
 	);
@@ -185,6 +191,7 @@ const loadDataFromSession = () => {
 	isLoading.value = true;
 	const storedSchedulesID = sessionStorage.getItem('schedulesID');
 	const storedScheduleStatus = sessionStorage.getItem('scheduleStatus');
+	const storedScheduleUpdate = sessionStorage.getItem('scheduleUpdate');
 	const storedCurrentSchedule = sessionStorage.getItem('currentSchedule');
 	const storedNextSchedule = sessionStorage.getItem('nextSchedule');
 
@@ -193,6 +200,9 @@ const loadDataFromSession = () => {
 	}
 	if (storedScheduleStatus) {
 		scheduleStatus.value = JSON.parse(storedScheduleStatus);
+	}
+	if (storedScheduleUpdate) {
+		scheduleUpdate.value = JSON.parse(storedScheduleUpdate);
 	}
 	if (storedCurrentSchedule) {
 		currentSchedule.value = JSON.parse(storedCurrentSchedule);
@@ -231,6 +241,9 @@ const fetchSchedulesID = async () => {
 	querySnap.forEach((doc) => {
 		schedulesID.value.push(doc.data());
 		scheduleStatus.value.push(doc.data().status);
+		scheduleUpdate.value.push(
+			new Date(doc.data().createdAt.toDate()).toLocaleString()
+		);
 	});
 };
 
@@ -312,8 +325,10 @@ watch(selectedSchedule, (newValue) => {
 
 	if (newValue === schedulesID.value[0]) {
 		schedules.value = nextSchedule.value;
+		updatedAt.value = scheduleUpdate.value[0];
 	} else {
 		schedules.value = currentSchedule.value;
+		updatedAt.value = scheduleUpdate.value[1];
 	}
 });
 

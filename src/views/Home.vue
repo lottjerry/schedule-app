@@ -28,7 +28,9 @@
 					></v-select>
 				</v-col>
 			</v-row>
-
+	<v-row class="justify-center pa-3">
+		Updated @ {{ updatedAt }}
+	</v-row>
 			<!-- ******* SCHEDULES VIEW DESKTOP ******* -->
 			<v-row class="hidden-sm-and-down justify-center">
 				<v-table>
@@ -165,6 +167,8 @@ let employeeCurrentSchedule = ref([]);
 let employeeNextSchedule = ref([]);
 let employeeSchedulesID = ref([]);
 let employeeScheduleStatus = ref([]);
+let employeeScheduleUpdate = ref([]);
+let updatedAt = ref()
 let schedules = ref([]);
 let dates = ref([]);
 let name = ref('');
@@ -182,6 +186,10 @@ const saveDataToSession = () => {
 	sessionStorage.setItem(
 		'employeeScheduleStatus',
 		JSON.stringify(employeeScheduleStatus.value)
+	);
+	sessionStorage.setItem(
+		'employeeScheduleUpdate',
+		JSON.stringify(employeeScheduleUpdate.value)
 	);
 	sessionStorage.setItem(
 		'employeeCurrentSchedule',
@@ -202,6 +210,9 @@ const loadDataFromSession = () => {
 	const storedemployeeScheduleStatus = sessionStorage.getItem(
 		'employeeScheduleStatus'
 	);
+	const storedemployeeScheduleUpdate = sessionStorage.getItem(
+		'employeeScheduleUpdate'
+	);
 	const storedemployeeCurrentSchedule = sessionStorage.getItem(
 		'employeeCurrentSchedule'
 	);
@@ -214,6 +225,9 @@ const loadDataFromSession = () => {
 	}
 	if (storedemployeeScheduleStatus) {
 		employeeScheduleStatus.value = JSON.parse(storedemployeeScheduleStatus);
+	}
+	if (storedemployeeScheduleStatus) {
+		employeeScheduleUpdate.value = JSON.parse(storedemployeeScheduleUpdate);
 	}
 	if (storedemployeeCurrentSchedule) {
 		employeeCurrentSchedule.value = JSON.parse(storedemployeeCurrentSchedule);
@@ -247,16 +261,20 @@ const fetchemployeeSchedulesID = async () => {
 
 	// Clear the schedules array before populating it
 	employeeSchedulesID.value = [];
-	employeeScheduleStatus.value = []
+	employeeScheduleStatus.value = [];
+	employeeScheduleUpdate.value = [];
 	// Add each doc's "name" field to the schedules array
 	querySnap.forEach((doc) => {
 		employeeSchedulesID.value.push(doc.data());
 		employeeScheduleStatus.value.push(doc.data().status);
+		employeeScheduleUpdate.value.push(
+			new Date(doc.data().createdAt.toDate()).toLocaleString()
+		);
 	});
 };
 
 const fetchemployeeNextSchedule = async () => {
-	employeeNextSchedule.value = []
+	employeeNextSchedule.value = [];
 	const querySnap = await getDocs(
 		query(
 			collection(
@@ -273,7 +291,7 @@ const fetchemployeeNextSchedule = async () => {
 	});
 };
 const fetchemployeeCurrentSchedule = async () => {
-	employeeCurrentSchedule.value = []
+	employeeCurrentSchedule.value = [];
 	const querySnap = await getDocs(
 		query(
 			collection(
@@ -334,11 +352,13 @@ const isToday = (date) => {
 
 watch(selectedSchedule, (newValue) => {
 	generateDateArray();
-
+	updatedAt.value = ''
 	if (newValue === employeeSchedulesID.value[0]) {
 		schedules.value = employeeNextSchedule.value;
+		updatedAt.value = employeeScheduleUpdate.value[0]
 	} else {
 		schedules.value = employeeCurrentSchedule.value;
+		updatedAt.value = employeeScheduleUpdate.value[1]
 	}
 });
 
@@ -352,6 +372,7 @@ watch(employeeSchedulesID, () => {
 
 // Load data from storage when the component is mounted
 onMounted(() => {
+	console.log(employeeScheduleUpdate);
 	fetchData();
 	loadDataFromSession();
 });
