@@ -1757,7 +1757,7 @@ const days = [
 	'SUNDAY',
 	'MONDAY',
 	'TUESDAY',
-	'WENDSDAY',
+	'WEDNESDAY',
 	'THURSDAY',
 	'FRIDAY',
 	'SATURDAY',

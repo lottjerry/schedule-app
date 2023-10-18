@@ -224,6 +224,7 @@ import {
 	createUserWithEmailAndPassword,
 	sendPasswordResetEmail,
 	signOut,
+	updateProfile,
 } from 'firebase/auth';
 import {
 	getFirestore,
@@ -280,24 +281,34 @@ const createUser = () => {
 				role: 'user',
 			};
 
-			setDoc(doc(db, 'users', userCredentials.user.uid), newUser)
+			// Set the user's display name to the firstName
+			updateProfile(userCredentials.user, {
+				displayName: firstName.value,
+			})
 				.then(() => {
-					isLoading.value = true;
-					alert(`Successfully created user ${firstName.value}`);
-					isLoading.value = false;
-					logout();
-					firstName.value = '';
-					lastName.value = '';
-					position.value = '';
-					email.value = '';
-					password.value = '';
-					name.value = '';
-					newUserDialog.value = false;
-					fetchUsers(); // Fetch updated user list
+					setDoc(doc(db, 'users', userCredentials.user.uid), newUser)
+						.then(() => {
+							isLoading.value = true;
+							alert(`Successfully created user ${firstName.value}`);
+							isLoading.value = false;
+							logout();
+							firstName.value = '';
+							lastName.value = '';
+							position.value = '';
+							email.value = '';
+							password.value = '';
+							name.value = '';
+							newUserDialog.value = false;
+							fetchUsers(); // Fetch updated user list
+						})
+						.catch((error) => {
+							isLoading.value = false;
+							errMsg.value = `Error adding user to the database: ${error.message}`;
+						});
 				})
 				.catch((error) => {
 					isLoading.value = false;
-					errMsg.value = `Error adding user to database: ${error.message}`;
+					errMsg.value = `Error setting display name: ${error.message}`;
 				});
 		})
 		.catch((error) => {
@@ -347,22 +358,36 @@ const updateUser = () => {
 	isLoading.value = true;
 	if (editUserId) {
 		const userRef = doc(db, 'users', editUserId);
+		const newFirstName = editFirstName.value; // Store the new first name
+
+		// Update the user's data in Firestore
 		updateDoc(userRef, {
-			firstName: editFirstName.value,
+			firstName: newFirstName,
 			lastName: editLastName.value,
 			position: editPosition.value,
 			email: editEmail.value,
 		})
 			.then(() => {
-				isLoading.value = false;
-				alert(`Successfully updated user ${editFirstName.value}`);
-				editUserId = null;
-				editFirstName.value = '';
-				editLastName.value = '';
-				editPosition.value = '';
-				editEmail.value = '';
-				editUserDialog.value = false;
-				fetchUsers(); // Fetch updated user list
+				// Set the user's display name to the new first name
+				const user = getAuth().currentUser;
+				updateProfile(user, {
+					displayName: newFirstName,
+				})
+					.then(() => {
+						isLoading.value = false;
+						alert(`Successfully updated user ${newFirstName}`);
+						editUserId = null;
+						editFirstName.value = '';
+						editLastName.value = '';
+						editPosition.value = '';
+						editEmail.value = '';
+						editUserDialog.value = false;
+						fetchUsers(); // Fetch updated user list
+					})
+					.catch((error) => {
+						isLoading.value = false;
+						editErrMsg.value = `Error updating user profile: ${error.message}`;
+					});
 			})
 			.catch((error) => {
 				isLoading.value = false;
@@ -370,7 +395,6 @@ const updateUser = () => {
 			});
 	}
 };
-
 // Cancel Edit User Dialog
 const cancelEditUserDialog = () => {
 	editUserId = null;

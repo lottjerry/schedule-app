@@ -11,15 +11,6 @@
 			<v-row class="justify-center pa-10">
 				<h1 class="text-primary">My Schedule</h1>
 			</v-row>
-			<v-row class="justify-center pa-5"
-				><v-btn
-					variant="outlined"
-					@click="fetchData"
-					:disabled="buttonDisabled"
-				>
-					Fetch Data
-				</v-btn></v-row
-			>
 			<v-row class="justify-center pa-10">
 				<v-col lg="2" md="2" sm="4">
 					<v-select
@@ -109,10 +100,7 @@
 								class="border rounded-xl mb-1"
 							>
 								<v-container>
-									<v-row>
-										<v-col cols="5" class="text-caption">{{
-											schedule.name
-										}}</v-col>
+									<v-row class="justify-center">
 										<div
 											class="text-caption"
 											v-for="employeeSchedule in schedule.schedule"
@@ -144,17 +132,36 @@
 					</v-card></v-col
 				>
 			</v-row>
+
+			<v-row>
+				<!-- Current Schedule -->
+				<v-col v-for="schedule in sc" :key="schedule">
+					<p>{{ schedule }}</p>
+				</v-col>
+				<!-- Next Schedule -->
+				<v-col></v-col>
+			</v-row>
 		</v-container>
 	</div>
 </template>
 
 <script setup>
 import { ref, watch, onMounted } from 'vue';
-import { getFirestore, query, collection, getDocs, where } from 'firebase/firestore';
+import { getAuth } from 'firebase/auth';
+
+import {
+	getFirestore,
+	query,
+	collection,
+	getDocs,
+	where,
+} from 'firebase/firestore';
 
 const db = getFirestore();
+const auth = getAuth();
+const user = auth.currentUser;
 
-let currentEmployeeSchedule = ref([]);
+let employeeCurrentSchedule = ref([]);
 let employeeNextSchedule = ref([]);
 let employeeSchedulesID = ref([]);
 let employeeScheduleStatus = ref([]);
@@ -168,25 +175,39 @@ let selectedSchedule = ref(); // To store the selected value
 
 const saveDataToSession = () => {
 	isLoading.value = true;
-	sessionStorage.setItem('employeeSchedulesID', JSON.stringify(employeeSchedulesID.value));
+	sessionStorage.setItem(
+		'employeeSchedulesID',
+		JSON.stringify(employeeSchedulesID.value)
+	);
 	sessionStorage.setItem(
 		'employeeScheduleStatus',
 		JSON.stringify(employeeScheduleStatus.value)
 	);
 	sessionStorage.setItem(
-		'currentEmployeeSchedule',
-		JSON.stringify(currentEmployeeSchedule.value)
+		'employeeCurrentSchedule',
+		JSON.stringify(employeeCurrentSchedule.value)
 	);
-	sessionStorage.setItem('employeeNextSchedule', JSON.stringify(employeeNextSchedule.value));
+	sessionStorage.setItem(
+		'employeeNextSchedule',
+		JSON.stringify(employeeNextSchedule.value)
+	);
 	isLoading.value = false;
 };
 
 const loadDataFromSession = () => {
 	isLoading.value = true;
-	const storedemployeeSchedulesID = sessionStorage.getItem('employeeSchedulesID');
-	const storedemployeeScheduleStatus = sessionStorage.getItem('employeeScheduleStatus');
-	const storedcurrentEmployeeSchedule = sessionStorage.getItem('currentEmployeeSchedule');
-	const storedemployeeNextSchedule = sessionStorage.getItem('employeeNextSchedule');
+	const storedemployeeSchedulesID = sessionStorage.getItem(
+		'employeeSchedulesID'
+	);
+	const storedemployeeScheduleStatus = sessionStorage.getItem(
+		'employeeScheduleStatus'
+	);
+	const storedemployeeCurrentSchedule = sessionStorage.getItem(
+		'employeeCurrentSchedule'
+	);
+	const storedemployeeNextSchedule = sessionStorage.getItem(
+		'employeeNextSchedule'
+	);
 
 	if (storedemployeeSchedulesID) {
 		employeeSchedulesID.value = JSON.parse(storedemployeeSchedulesID);
@@ -194,8 +215,8 @@ const loadDataFromSession = () => {
 	if (storedemployeeScheduleStatus) {
 		employeeScheduleStatus.value = JSON.parse(storedemployeeScheduleStatus);
 	}
-	if (storedcurrentEmployeeSchedule) {
-		currentEmployeeSchedule.value = JSON.parse(storedcurrentEmployeeSchedule);
+	if (storedemployeeCurrentSchedule) {
+		employeeCurrentSchedule.value = JSON.parse(storedemployeeCurrentSchedule);
 	}
 	if (storedemployeeNextSchedule) {
 		employeeNextSchedule.value = JSON.parse(storedemployeeNextSchedule);
@@ -208,9 +229,8 @@ const fetchData = async () => {
 	isLoading.value = true;
 	try {
 		await fetchemployeeSchedulesID();
-		await fetchcurrentEmployeeSchedule();
+		await fetchemployeeCurrentSchedule();
 		await fetchemployeeNextSchedule();
-		alert('Data Fetched');
 
 		// Save the data to session storage
 		saveDataToSession();
@@ -227,6 +247,7 @@ const fetchemployeeSchedulesID = async () => {
 
 	// Clear the schedules array before populating it
 	employeeSchedulesID.value = [];
+	employeeScheduleStatus.value = []
 	// Add each doc's "name" field to the schedules array
 	querySnap.forEach((doc) => {
 		employeeSchedulesID.value.push(doc.data());
@@ -235,21 +256,24 @@ const fetchemployeeSchedulesID = async () => {
 };
 
 const fetchemployeeNextSchedule = async () => {
+	employeeNextSchedule.value = []
 	const querySnap = await getDocs(
 		query(
 			collection(
 				db,
 				'Schedules',
 				employeeSchedulesID.value[0].name,
-				employeeSchedulesID.value[0].name,
-			), where('name', '==', 'ALISON')
+				employeeSchedulesID.value[0].name
+			),
+			where('name', '==', user.displayName)
 		)
 	);
 	querySnap.forEach((doc) => {
 		employeeNextSchedule.value.push(doc.data());
 	});
 };
-const fetchcurrentEmployeeSchedule = async () => {
+const fetchemployeeCurrentSchedule = async () => {
+	employeeCurrentSchedule.value = []
 	const querySnap = await getDocs(
 		query(
 			collection(
@@ -257,11 +281,12 @@ const fetchcurrentEmployeeSchedule = async () => {
 				'Schedules',
 				employeeSchedulesID.value[1].name,
 				employeeSchedulesID.value[1].name
-			), where('name', '==', 'ALISON')
+			),
+			where('name', '==', user.displayName)
 		)
 	);
 	querySnap.forEach((doc) => {
-		currentEmployeeSchedule.value.push(doc.data());
+		employeeCurrentSchedule.value.push(doc.data());
 	});
 };
 
@@ -313,7 +338,7 @@ watch(selectedSchedule, (newValue) => {
 	if (newValue === employeeSchedulesID.value[0]) {
 		schedules.value = employeeNextSchedule.value;
 	} else {
-		schedules.value = currentEmployeeSchedule.value;
+		schedules.value = employeeCurrentSchedule.value;
 	}
 });
 
@@ -327,6 +352,7 @@ watch(employeeSchedulesID, () => {
 
 // Load data from storage when the component is mounted
 onMounted(() => {
+	fetchData();
 	loadDataFromSession();
 });
 
@@ -334,7 +360,7 @@ const days = [
 	'SUNDAY',
 	'MONDAY',
 	'TUESDAY',
-	'WENDSDAY',
+	'WEDNESDAY',
 	'THURSDAY',
 	'FRIDAY',
 	'SATURDAY',
