@@ -15,7 +15,7 @@
 						<v-list-item-title>My Schedule</v-list-item-title>
 					</v-list-item>
 					<v-list-item to="/grocery_schedules">
-						<v-list-item-title>Grocery Schedules</v-list-item-title>
+						<v-list-item-title>Grocery Schedule</v-list-item-title>
 					</v-list-item>
 					<div v-if="user_role === 'admin'">
 						<v-list-item to="/users">
