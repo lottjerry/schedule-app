@@ -11,12 +11,12 @@ import { initializeApp } from "firebase/app";
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-	apiKey: 'AIzaSyATM4C-1VKGRxKE7DuybtBocY0dNB_AmvM',
-	authDomain: 'schedule-app-e5cc8.firebaseapp.com',
-	projectId: 'schedule-app-e5cc8',
-	storageBucket: 'schedule-app-e5cc8.appspot.com',
-	messagingSenderId: '711704796011',
-	appId: '1:711704796011:web:ff30897ac74d4ef3d6ca2e',
+	apiKey: process.env.VUE_APP_FIREBASE_API_KEY,
+	authDomain: process.env.VUE_APP_FIREBASE_AUTH_DOMAIN,
+	projectId: process.env.VUE_APP_FIREBASE_PROJECT_ID,
+	storageBucket: process.env.VUE_APP_FIREBASE_STORAGE_BUCKET,
+	messagingSenderId: process.env.VUE_APP_FIREBASE_MESSAGING_SENDER_ID,
+	appId: process.env.VUE_APP_FIREBASE_APP_ID,
 };
 
 // Initialize Firebase
