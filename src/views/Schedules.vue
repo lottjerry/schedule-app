@@ -59,25 +59,6 @@
 						auto-apply
 					/>
 				</v-card-text>
-				<v-card-text>
-					<v-container>
-						<v-row class="justify-center">
-							<v-col cols="1" class="justify-center">
-								<p>Schedule Status</p>
-								<v-switch
-									color="indigo-darken-3"
-									value="indigo-darken-3"
-									class="justify-center"
-									v-model="scheduleStatus"
-									hide-details
-									true-value="Next"
-									false-value="Current"
-									:label="scheduleStatus"
-								></v-switch
-							></v-col>
-						</v-row>
-					</v-container>
-				</v-card-text>
 
 				<!-- ******* SCHEDULE PREVIEW DESKTOP ******* -->
 				<v-card-text class="hidden-sm-and-down">
@@ -221,25 +202,6 @@
 						inline
 						auto-apply
 					/>
-				</v-card-text>
-				<v-card-text>
-					<v-container>
-						<v-row class="justify-center">
-							<v-col cols="6" class="justify-center">
-								<p>Schedule Status</p>
-								<v-switch
-									color="indigo-darken-3"
-									value="indigo-darken-3"
-									class="justify-center"
-									v-model="scheduleStatus"
-									hide-details
-									true-value="Next"
-									false-value="Current"
-									:label="scheduleStatus"
-								></v-switch
-							></v-col>
-						</v-row>
-					</v-container>
 				</v-card-text>
 				<!-- ******* SCHEDULE PREVIEW MOBILE ******* -->
 				<v-card-text>

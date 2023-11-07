@@ -16,15 +16,9 @@
 					<v-select
 						color="primary"
 						label="Select"
-						:hint="`${name} - ${status}`"
-						:items="employeeSchedulesID"
-						item-title="status"
-						item-value="name"
+						:items="schedulesID"
 						v-model="selectedSchedule"
 						variant="outlined"
-						persistent-hint
-						return-object
-						single-line
 					></v-select>
 				</v-col>
 			</v-row>
@@ -57,16 +51,17 @@
 						<tr v-for="schedule in schedules" :key="schedule" class="border">
 							<td class="border">
 								<h3 variant="plain" class="pa-3">
-									{{ schedule.name }}
+									{{ user.displayName }}
 								</h3>
+								<h2>{{schedule.JERRY[0].time}}</h2>
 							</td>
 							<td
-								v-for="employeeSchedule in schedule.schedule"
-								:key="employeeSchedule"
+								v-for="time in schedule.JERRY[0].time"
+								:key="time"
 								class="border"
 							>
 								<div class="pa-5">
-									<h4>{{ employeeSchedule.time }}</h4>
+									<h4>{{ time }}</h4>
 									<h4
 										v-for="position in employeeSchedule.positions"
 										:key="position"
@@ -151,173 +146,51 @@
 import { ref, watch, onMounted } from 'vue';
 import { getAuth } from 'firebase/auth';
 
-import {
-	getFirestore,
-	query,
-	collection,
-	getDocs,
-	where,
-} from 'firebase/firestore';
-
+import { getFirestore, query, collection, getDocs, doc, getDoc } from 'firebase/firestore';
 const db = getFirestore();
 const auth = getAuth();
 const user = auth.currentUser;
 
-let employeeCurrentSchedule = ref([]);
-let employeeNextSchedule = ref([]);
-let employeeSchedulesID = ref([]);
-let employeeScheduleStatus = ref([]);
-let employeeScheduleUpdate = ref([]);
+let schedulesID = ref([])
 let updatedAt = ref()
 let schedules = ref([]);
 let dates = ref([]);
-let name = ref('');
-let status = ref('');
 const isLoading = ref(false);
-const buttonDisabled = ref(false);
 let selectedSchedule = ref(); // To store the selected value
 
-const saveDataToSession = () => {
-	isLoading.value = true;
-	sessionStorage.setItem(
-		'employeeSchedulesID',
-		JSON.stringify(employeeSchedulesID.value)
-	);
-	sessionStorage.setItem(
-		'employeeScheduleStatus',
-		JSON.stringify(employeeScheduleStatus.value)
-	);
-	sessionStorage.setItem(
-		'employeeScheduleUpdate',
-		JSON.stringify(employeeScheduleUpdate.value)
-	);
-	sessionStorage.setItem(
-		'employeeCurrentSchedule',
-		JSON.stringify(employeeCurrentSchedule.value)
-	);
-	sessionStorage.setItem(
-		'employeeNextSchedule',
-		JSON.stringify(employeeNextSchedule.value)
-	);
-	isLoading.value = false;
-};
-
-const loadDataFromSession = () => {
-	isLoading.value = true;
-	const storedemployeeSchedulesID = sessionStorage.getItem(
-		'employeeSchedulesID'
-	);
-	const storedemployeeScheduleStatus = sessionStorage.getItem(
-		'employeeScheduleStatus'
-	);
-	const storedemployeeScheduleUpdate = sessionStorage.getItem(
-		'employeeScheduleUpdate'
-	);
-	const storedemployeeCurrentSchedule = sessionStorage.getItem(
-		'employeeCurrentSchedule'
-	);
-	const storedemployeeNextSchedule = sessionStorage.getItem(
-		'employeeNextSchedule'
-	);
-
-	if (storedemployeeSchedulesID) {
-		employeeSchedulesID.value = JSON.parse(storedemployeeSchedulesID);
-	}
-	if (storedemployeeScheduleStatus) {
-		employeeScheduleStatus.value = JSON.parse(storedemployeeScheduleStatus);
-	}
-	if (storedemployeeScheduleStatus) {
-		employeeScheduleUpdate.value = JSON.parse(storedemployeeScheduleUpdate);
-	}
-	if (storedemployeeCurrentSchedule) {
-		employeeCurrentSchedule.value = JSON.parse(storedemployeeCurrentSchedule);
-	}
-	if (storedemployeeNextSchedule) {
-		employeeNextSchedule.value = JSON.parse(storedemployeeNextSchedule);
-	}
-	isLoading.value = false;
-};
-
-// Current Problem: Fetch Schedule IDs but not the actual schedule data. Have to click Fetch Data Button Twice
-const fetchData = async () => {
-	isLoading.value = true;
-	try {
-		await fetchemployeeSchedulesID();
-		await fetchemployeeCurrentSchedule();
-		await fetchemployeeNextSchedule();
-
-		// Save the data to session storage
-		saveDataToSession();
-	} catch (error) {
-		console.error('An error occurred: ', error);
-	}
-	isLoading.value = false;
-};
-
-// You should have two functions that return Promises, fetchemployeeSchedulesID and fetchSchedules.
-
-const fetchemployeeSchedulesID = async () => {
+const fetchSchedulesID = async () => {
 	const querySnap = await getDocs(query(collection(db, 'Schedules')));
 
 	// Clear the schedules array before populating it
-	employeeSchedulesID.value = [];
-	employeeScheduleStatus.value = [];
-	employeeScheduleUpdate.value = [];
+	schedulesID.value = [];
+
 	// Add each doc's "name" field to the schedules array
 	querySnap.forEach((doc) => {
-		employeeSchedulesID.value.push(doc.data());
-		employeeScheduleStatus.value.push(doc.data().status);
-		employeeScheduleUpdate.value.push(
-			new Date(doc.data().createdAt.toDate()).toLocaleString()
-		);
+		schedulesID.value.push(doc.id);
 	});
 };
 
-const fetchemployeeNextSchedule = async () => {
-	employeeNextSchedule.value = [];
-	const querySnap = await getDocs(
-		query(
-			collection(
-				db,
-				'Schedules',
-				employeeSchedulesID.value[0].name,
-				employeeSchedulesID.value[0].name
-			),
-			where('name', '==', user.displayName)
-		)
-	);
-	querySnap.forEach((doc) => {
-		employeeNextSchedule.value.push(doc.data());
-	});
+const fetchSchedules = async () => {
+	const docRef = doc(db, 'Schedules', selectedSchedule.value);
+	const docSnap = await getDoc(docRef);
+
+	if (docSnap.exists()) {
+		schedules.value.push(docSnap.data());
+		updatedAt.value = new Date(
+			schedules.value[0].createdAt.toDate()
+		).toLocaleString();
+	} else {
+		// docSnap.data() will be undefined in this case
+		console.log('No such document!');
+	}
 };
-const fetchemployeeCurrentSchedule = async () => {
-	employeeCurrentSchedule.value = [];
-	const querySnap = await getDocs(
-		query(
-			collection(
-				db,
-				'Schedules',
-				employeeSchedulesID.value[1].name,
-				employeeSchedulesID.value[1].name
-			),
-			where('name', '==', user.displayName)
-		)
-	);
-	querySnap.forEach((doc) => {
-		employeeCurrentSchedule.value.push(doc.data());
-	});
-};
+
 
 // Function to generate an array of formatted date strings for 7 previous days before the end date
 const generateDateArray = () => {
 	dates.value = [];
-	name.value = null;
-	status.value = null;
 
-	name.value = selectedSchedule.value.name;
-	status.value = selectedSchedule.value.status;
-
-	const endDate = new Date(selectedSchedule.value.name);
+	const endDate = new Date(selectedSchedule.value);
 
 	for (let i = 6; i >= 0; i--) {
 		const currentDate = new Date(endDate);
@@ -347,34 +220,26 @@ const isToday = (date) => {
 	const formattedDate = formatDate(today);
 	return formattedDate === date;
 };
+// Watch for changes in the selectedSchedule and update other data
+watch(selectedSchedule, (newSelectedSchedule, oldSelectedSchedule) => {
+  if (newSelectedSchedule !== oldSelectedSchedule) {
+    // You can perform additional actions here
+    // For example, you can clear the existing schedules
+    schedules.value = [];
+    
+    // Then fetch new schedules
+    fetchSchedules();
+    
+    // Update other data as needed
+    // For example, generate a new date array
+    generateDateArray();
 
-// Watch for changes in the date and update the formatted date
-
-watch(selectedSchedule, (newValue) => {
-	generateDateArray();
-	updatedAt.value = ''
-	if (newValue === employeeSchedulesID.value[0]) {
-		schedules.value = employeeNextSchedule.value;
-		updatedAt.value = employeeScheduleUpdate.value[0]
-	} else {
-		schedules.value = employeeCurrentSchedule.value;
-		updatedAt.value = employeeScheduleUpdate.value[1]
-	}
+    // You can also perform any other actions you need here
+  }
 });
 
-watch(employeeSchedulesID, () => {
-	if (employeeSchedulesID.value) {
-		buttonDisabled.value = true;
-	} else {
-		buttonDisabled.value = false;
-	}
-});
-
-// Load data from storage when the component is mounted
 onMounted(() => {
-	console.log(employeeScheduleUpdate);
-	fetchData();
-	loadDataFromSession();
+	fetchSchedulesID();
 });
 
 const days = [
