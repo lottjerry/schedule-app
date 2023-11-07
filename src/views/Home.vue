@@ -22,9 +22,7 @@
 					></v-select>
 				</v-col>
 			</v-row>
-	<v-row class="justify-center pa-3">
-		Updated @ {{ updatedAt }}
-	</v-row>
+			<v-row class="justify-center pa-3"> Updated @ {{ updatedAt }} </v-row>
 			<!-- ******* SCHEDULES VIEW DESKTOP ******* -->
 			<v-row class="hidden-sm-and-down justify-center">
 				<v-table>
@@ -48,25 +46,21 @@
 						</tr>
 					</thead>
 					<tbody>
-						<tr v-for="schedule in schedules" :key="schedule" class="border">
+						<tr
+							v-for="employee in schedules"
+							:key="employee"
+							class="border"
+						>
 							<td class="border">
 								<h3 variant="plain" class="pa-3">
-									{{ user.displayName }}
+									{{ employee.employeeName }}
 								</h3>
-								<h2>{{schedule.JERRY[0].time}}</h2>
 							</td>
-							<td
-								v-for="time in schedule.JERRY[0].time"
-								:key="time"
-								class="border"
-							>
+							<td v-for="(day, index) in days" :key="index" class="border">
 								<div class="pa-5">
-									<h4>{{ time }}</h4>
-									<h4
-										v-for="position in employeeSchedule.positions"
-										:key="position"
-									>
-										{{ position }}
+									<h4>{{ employee.schedule[index].time}}</h4>
+									<h4 v-for="positions in employee.schedule[index].positions" :key="positions">
+										{{ positions }}
 										<!-- Positions -->
 									</h4>
 								</div>
@@ -75,7 +69,8 @@
 					</tbody>
 				</v-table>
 			</v-row>
-			<!-- ******* SCHEDULES VIEW MOBILE DEVICES ******* -->
+
+			<!-- ******* SCHEDULES VIEW MOBILE DEVICES ******* 
 			<v-row v-if="selectedSchedule" class="hidden-md-and-up">
 				<v-col
 					><v-card
@@ -129,30 +124,29 @@
 					</v-card></v-col
 				>
 			</v-row>
-
-			<v-row>
-				<!-- Current Schedule -->
-				<v-col v-for="schedule in sc" :key="schedule">
-					<p>{{ schedule }}</p>
-				</v-col>
-				<!-- Next Schedule -->
-				<v-col></v-col>
-			</v-row>
+			-->
 		</v-container>
 	</div>
 </template>
 
 <script setup>
 import { ref, watch, onMounted } from 'vue';
-import { getAuth } from 'firebase/auth';
+//import { getAuth } from 'firebase/auth';
 
-import { getFirestore, query, collection, getDocs, doc, getDoc } from 'firebase/firestore';
+import {
+	getFirestore,
+	query,
+	collection,
+	getDocs,
+	doc,
+	getDoc,
+} from 'firebase/firestore';
 const db = getFirestore();
-const auth = getAuth();
-const user = auth.currentUser;
+//const auth = getAuth();
+//const user = auth.currentUser;
 
-let schedulesID = ref([])
-let updatedAt = ref()
+let schedulesID = ref([]);
+let updatedAt = ref('');
 let schedules = ref([]);
 let dates = ref([]);
 const isLoading = ref(false);
@@ -175,16 +169,17 @@ const fetchSchedules = async () => {
 	const docSnap = await getDoc(docRef);
 
 	if (docSnap.exists()) {
-		schedules.value.push(docSnap.data());
+		// updateAt
 		updatedAt.value = new Date(
-			schedules.value[0].createdAt.toDate()
+			docSnap.data().createdAt.toDate()
 		).toLocaleString();
+		// Schedules
+		schedules.value = docSnap.data().scheduleData;
 	} else {
 		// docSnap.data() will be undefined in this case
 		console.log('No such document!');
 	}
 };
-
 
 // Function to generate an array of formatted date strings for 7 previous days before the end date
 const generateDateArray = () => {
@@ -222,20 +217,19 @@ const isToday = (date) => {
 };
 // Watch for changes in the selectedSchedule and update other data
 watch(selectedSchedule, (newSelectedSchedule, oldSelectedSchedule) => {
-  if (newSelectedSchedule !== oldSelectedSchedule) {
-    // You can perform additional actions here
-    // For example, you can clear the existing schedules
-    schedules.value = [];
-    
-    // Then fetch new schedules
-    fetchSchedules();
-    
-    // Update other data as needed
-    // For example, generate a new date array
-    generateDateArray();
+	if (newSelectedSchedule !== oldSelectedSchedule) {
+		// You can perform additional actions here
+		// For example, you can clear the existing schedules
+		schedules.value = [];
 
-    // You can also perform any other actions you need here
-  }
+		// Then fetch new schedules
+		fetchSchedules();
+
+		// Update other data as needed
+		// For example, generate a new date array
+		generateDateArray();
+		// You can also perform any other actions you need here
+	}
 });
 
 onMounted(() => {
