@@ -1567,7 +1567,7 @@ const createSchedule = async () => {
         }));
 
         scheduleData.push({
-            employee_name: employee.name,
+            employeeName: employee.name,
             schedule: employeeSchedule,
         });
     }
