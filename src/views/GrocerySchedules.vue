@@ -9,31 +9,16 @@
 		</v-overlay>
 		<v-container class="mb-16">
 			<v-row class="justify-center pa-10">
-				<h1 class="text-primary">Grocery Schedules</h1>
+				<h1 class="text-primary">Grocery Schedule</h1>
 			</v-row>
-			<v-row class="justify-center pa-5"
-				><v-btn
-					variant="outlined"
-					@click="fetchData"
-					:disabled="buttonDisabled"
-				>
-					Fetch Data
-				</v-btn></v-row
-			>
 			<v-row class="justify-center pa-10">
 				<v-col lg="2" md="2" sm="4">
 					<v-select
 						color="primary"
 						label="Select"
-						:hint="`${name} - ${status}`"
 						:items="schedulesID"
-						item-title="status"
-						item-value="name"
 						v-model="selectedSchedule"
 						variant="outlined"
-						persistent-hint
-						return-object
-						single-line
 					></v-select>
 				</v-col>
 			</v-row>
@@ -61,24 +46,21 @@
 						</tr>
 					</thead>
 					<tbody>
-						<tr v-for="schedule in schedules" :key="schedule" class="border">
+						<tr
+							v-for="employee in schedules"
+							:key="employee"
+							class="border"
+						>
 							<td class="border">
 								<h3 variant="plain" class="pa-3">
-									{{ schedule.name }}
+									{{ employee.employeeName }}
 								</h3>
 							</td>
-							<td
-								v-for="employeeSchedule in schedule.schedule"
-								:key="employeeSchedule"
-								class="border"
-							>
+							<td v-for="(day, index) in days" :key="index" class="border">
 								<div class="pa-5">
-									<h4>{{ employeeSchedule.time }}</h4>
-									<h4
-										v-for="position in employeeSchedule.positions"
-										:key="position"
-									>
-										{{ position }}
+									<h4>{{ employee.schedule[index].time}}</h4>
+									<h4 v-for="positions in employee.schedule[index].positions" :key="positions">
+										{{ positions }}
 										<!-- Positions -->
 									</h4>
 								</div>
@@ -87,7 +69,8 @@
 					</tbody>
 				</v-table>
 			</v-row>
-			<!-- ******* SCHEDULES VIEW MOBILE DEVICES ******* -->
+
+			<!-- ******* SCHEDULES VIEW MOBILE DEVICES ******* 
 			<v-row v-if="selectedSchedule" class="hidden-md-and-up">
 				<v-col
 					><v-card
@@ -109,10 +92,7 @@
 								class="border rounded-xl mb-1"
 							>
 								<v-container>
-									<v-row>
-										<v-col cols="5" class="text-caption">{{
-											schedule.name
-										}}</v-col>
+									<v-row class="justify-center">
 										<div
 											class="text-caption"
 											v-for="employeeSchedule in schedule.schedule"
@@ -144,150 +124,68 @@
 					</v-card></v-col
 				>
 			</v-row>
+			-->
 		</v-container>
 	</div>
 </template>
 
 <script setup>
 import { ref, watch, onMounted } from 'vue';
-import { getFirestore, query, collection, getDocs } from 'firebase/firestore';
+//import { getAuth } from 'firebase/auth';
 
+import {
+	getFirestore,
+	query,
+	collection,
+	getDocs,
+	doc,
+	getDoc,
+} from 'firebase/firestore';
 const db = getFirestore();
+//const auth = getAuth();
+//const user = auth.currentUser;
 
-let currentSchedule = ref([]);
-let nextSchedule = ref([]);
 let schedulesID = ref([]);
-let scheduleStatus = ref([]);
-let scheduleUpdate = ref([]);
+let updatedAt = ref('');
 let schedules = ref([]);
-let updatedAt = ref();
 let dates = ref([]);
-let name = ref('');
-let status = ref('');
 const isLoading = ref(false);
-const buttonDisabled = ref(false);
 let selectedSchedule = ref(); // To store the selected value
-
-const saveDataToSession = () => {
-	isLoading.value = true;
-	sessionStorage.setItem('schedulesID', JSON.stringify(schedulesID.value));
-	sessionStorage.setItem(
-		'scheduleStatus',
-		JSON.stringify(scheduleStatus.value)
-	);
-	sessionStorage.setItem(
-		'scheduleUpdate',
-		JSON.stringify(scheduleUpdate.value)
-	);
-	sessionStorage.setItem(
-		'currentSchedule',
-		JSON.stringify(currentSchedule.value)
-	);
-	sessionStorage.setItem('nextSchedule', JSON.stringify(nextSchedule.value));
-	isLoading.value = false;
-};
-
-const loadDataFromSession = () => {
-	isLoading.value = true;
-	const storedSchedulesID = sessionStorage.getItem('schedulesID');
-	const storedScheduleStatus = sessionStorage.getItem('scheduleStatus');
-	const storedScheduleUpdate = sessionStorage.getItem('scheduleUpdate');
-	const storedCurrentSchedule = sessionStorage.getItem('currentSchedule');
-	const storedNextSchedule = sessionStorage.getItem('nextSchedule');
-
-	if (storedSchedulesID) {
-		schedulesID.value = JSON.parse(storedSchedulesID);
-	}
-	if (storedScheduleStatus) {
-		scheduleStatus.value = JSON.parse(storedScheduleStatus);
-	}
-	if (storedScheduleUpdate) {
-		scheduleUpdate.value = JSON.parse(storedScheduleUpdate);
-	}
-	if (storedCurrentSchedule) {
-		currentSchedule.value = JSON.parse(storedCurrentSchedule);
-	}
-	if (storedNextSchedule) {
-		nextSchedule.value = JSON.parse(storedNextSchedule);
-	}
-	isLoading.value = false;
-};
-
-// Current Problem: Fetch Schedule IDs but not the actual schedule data. Have to click Fetch Data Button Twice
-const fetchData = async () => {
-	isLoading.value = true;
-	try {
-		await fetchSchedulesID();
-		await fetchCurrentSchedule();
-		await fetchNextSchedule();
-		alert('Data Fetched');
-
-		// Save the data to session storage
-		saveDataToSession();
-	} catch (error) {
-		console.error('An error occurred: ', error);
-	}
-	isLoading.value = false;
-};
-
-// You should have two functions that return Promises, fetchSchedulesID and fetchSchedules.
 
 const fetchSchedulesID = async () => {
 	const querySnap = await getDocs(query(collection(db, 'Schedules')));
 
 	// Clear the schedules array before populating it
 	schedulesID.value = [];
+
 	// Add each doc's "name" field to the schedules array
 	querySnap.forEach((doc) => {
-		schedulesID.value.push(doc.data());
-		scheduleStatus.value.push(doc.data().status);
-		scheduleUpdate.value.push(
-			new Date(doc.data().createdAt.toDate()).toLocaleString()
-		);
+		schedulesID.value.push(doc.id);
 	});
 };
 
-const fetchNextSchedule = async () => {
-	const querySnap = await getDocs(
-		query(
-			collection(
-				db,
-				'Schedules',
-				schedulesID.value[0].name,
-				schedulesID.value[0].name
-			)
-		)
-	);
-	querySnap.forEach((doc) => {
-		nextSchedule.value.push(doc.data());
-	});
-};
-const fetchCurrentSchedule = async () => {
-	const querySnap = await getDocs(
-		query(
-			collection(
-				db,
-				'Schedules',
-				schedulesID.value[1].name,
-				schedulesID.value[1].name
-			)
-		)
-	);
-	querySnap.forEach((doc) => {
-		currentSchedule.value.push(doc.data());
-	});
+const fetchSchedules = async () => {
+	const docRef = doc(db, 'Schedules', selectedSchedule.value);
+	const docSnap = await getDoc(docRef);
+
+	if (docSnap.exists()) {
+		// updateAt
+		updatedAt.value = new Date(
+			docSnap.data().createdAt.toDate()
+		).toLocaleString();
+		// Schedules
+		schedules.value = docSnap.data().scheduleData;
+	} else {
+		// docSnap.data() will be undefined in this case
+		console.log('No such document!');
+	}
 };
 
 // Function to generate an array of formatted date strings for 7 previous days before the end date
 const generateDateArray = () => {
 	dates.value = [];
-	name.value = null;
-	status.value = null;
 
-	name.value = selectedSchedule.value.name;
-	status.value = selectedSchedule.value.status;
-
-	const endDate = new Date(selectedSchedule.value.name);
+	const endDate = new Date(selectedSchedule.value);
 
 	for (let i = 6; i >= 0; i--) {
 		const currentDate = new Date(endDate);
@@ -317,32 +215,25 @@ const isToday = (date) => {
 	const formattedDate = formatDate(today);
 	return formattedDate === date;
 };
+// Watch for changes in the selectedSchedule and update other data
+watch(selectedSchedule, (newSelectedSchedule, oldSelectedSchedule) => {
+	if (newSelectedSchedule !== oldSelectedSchedule) {
+		// You can perform additional actions here
+		// For example, you can clear the existing schedules
+		schedules.value = [];
 
-// Watch for changes in the date and update the formatted date
+		// Then fetch new schedules
+		fetchSchedules();
 
-watch(selectedSchedule, (newValue) => {
-	generateDateArray();
-
-	if (newValue === schedulesID.value[0]) {
-		schedules.value = nextSchedule.value;
-		updatedAt.value = scheduleUpdate.value[0];
-	} else {
-		schedules.value = currentSchedule.value;
-		updatedAt.value = scheduleUpdate.value[1];
+		// Update other data as needed
+		// For example, generate a new date array
+		generateDateArray();
+		// You can also perform any other actions you need here
 	}
 });
 
-watch(schedulesID, () => {
-	if (schedulesID.value) {
-		buttonDisabled.value = true;
-	} else {
-		buttonDisabled.value = false;
-	}
-});
-
-// Load data from storage when the component is mounted
 onMounted(() => {
-	loadDataFromSession();
+	fetchSchedulesID();
 });
 
 const days = [

@@ -46,11 +46,7 @@
 						</tr>
 					</thead>
 					<tbody>
-						<tr
-							v-for="employee in schedules"
-							:key="employee"
-							class="border"
-						>
+						<tr v-for="employee in schedules" :key="employee" class="border">
 							<td class="border">
 								<h3 variant="plain" class="pa-3">
 									{{ employee.employeeName }}
@@ -58,8 +54,11 @@
 							</td>
 							<td v-for="(day, index) in days" :key="index" class="border">
 								<div class="pa-5">
-									<h4>{{ employee.schedule[index].time}}</h4>
-									<h4 v-for="positions in employee.schedule[index].positions" :key="positions">
+									<h4>{{ employee.schedule[index].time }}</h4>
+									<h4
+										v-for="positions in employee.schedule[index].positions"
+										:key="positions"
+									>
 										{{ positions }}
 										<!-- Positions -->
 									</h4>
@@ -131,7 +130,7 @@
 
 <script setup>
 import { ref, watch, onMounted } from 'vue';
-//import { getAuth } from 'firebase/auth';
+import { getAuth } from 'firebase/auth';
 
 import {
 	getFirestore,
@@ -142,8 +141,8 @@ import {
 	getDoc,
 } from 'firebase/firestore';
 const db = getFirestore();
-//const auth = getAuth();
-//const user = auth.currentUser;
+const auth = getAuth();
+const user = auth.currentUser;
 
 let schedulesID = ref([]);
 let updatedAt = ref('');
@@ -174,7 +173,8 @@ const fetchSchedules = async () => {
 			docSnap.data().createdAt.toDate()
 		).toLocaleString();
 		// Schedules
-		schedules.value = docSnap.data().scheduleData;
+		schedules.value = docSnap.data().scheduleData.filter((schedule) => schedule.employeeName === user.displayName);
+
 	} else {
 		// docSnap.data() will be undefined in this case
 		console.log('No such document!');
