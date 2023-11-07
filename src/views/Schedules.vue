@@ -333,7 +333,7 @@
 					<v-container class="border">
 						<v-row>
 							<v-col cols="8"
-								><p>{{ schedule.name }} - {{ schedule.status }}</p></v-col
+								><p>{{ schedule.name }}</p></v-col
 							>
 							<v-col
 								><v-btn
@@ -358,7 +358,7 @@
 					<v-container class="border rounded-xl my-3">
 						<v-row>
 							<v-col
-								><p>{{ schedule.name }} - {{ schedule.status }}</p></v-col
+								><p>{{ schedule.name }}</p></v-col
 							>
 							<v-col
 								><v-btn
@@ -390,7 +390,7 @@ import {
 	query,
 	collection,
 	deleteDoc,
-  serverTimestamp,
+	serverTimestamp,
 } from 'firebase/firestore';
 import Datepicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css';
@@ -404,7 +404,6 @@ const startDate = ref('');
 const endDate = ref('');
 let selectedEmployee = ref('');
 let selectedSchedule = ref([]);
-let scheduleStatus = ref('');
 let schedules = ref([]);
 const scheduleDates = ref([]); // To store the array of dates
 const employees = ref([
@@ -1557,61 +1556,42 @@ const deleteDocument = async (id) => {
 };
 
 const createSchedule = async () => {
-	//const scheduleTitle = `${startDate.value} - ${endDate.value}`;
-	// Replace 'employees' with your Firestore collection name
-	isLoading.value = true;
-	createDocument();
+    isLoading.value = true;
+    const scheduleData = [];
 
-	for (const employee of employees.value) {
-		try {
-			await setDoc(
-				doc(db, 'Schedules', endDate.value, endDate.value, employee.name),
-				{
-					name: employee.name,
-					schedule: employee.schedule.map((day) => ({
-						day: day.day,
-						time: day.time,
-						positions: day.positions,
-					})),
-				},
-				{ merge: true }
-			);
-		} catch (error) {
-			isLoading.value = false;
-			console.error(`Error adding employee ${employee.name}:`, error);
-		}
-	}
-	isLoading.value = false;
-	alert(`New Schedule with end date ${endDate.value} has been made`);
-	cancelNewScheduleDialog();
-	fetchSchedules();
-};
+    for (const employee of employees.value) {
+        const employeeSchedule = employee.schedule.map((day) => ({
+            day: day.day,
+            time: day.time,
+            positions: day.positions,
+        }));
 
-const createDocument = async () => {
-	// Generate a custom document ID or use an existing one
-	const customDocumentID = endDate.value; // Replace 'your_custom_id' with the ID you want to assign
+        scheduleData.push({
+            employee_name: employee.name,
+            schedule: employeeSchedule,
+        });
+    }
 
-	try {
-		// Specify the custom document ID when creating the endDate document
-		const endDateDocRef = doc(db, 'Schedules', customDocumentID);
+    try {
+        // Create or update the schedule document with all the data
+        await setDoc(
+            doc(db, 'Schedules', endDate.value),
+            {
+                name: endDate.value,
+                scheduleData,
+                createdAt: serverTimestamp(),
+            },
+            { merge: true }
+        );
 
-		await setDoc(
-			endDateDocRef,
-			{
-				// Include other data for the endDate document
-				name: endDate.value, // Modify this as needed
-				status: scheduleStatus.value,
-				createdAt: serverTimestamp()
-			},
-			{ merge: true }
-		);
-
-		console.log(
-			(isLoading.value = false`EndDate document added to Firestore with ID: ${customDocumentID}`)
-		);
-	} catch (error) {
-		console.error('Error adding endDate document:', error);
-	}
+        isLoading.value = false;
+        alert(`New Schedule with end date ${endDate.value} has been made`);
+        cancelNewScheduleDialog();
+        fetchSchedules();
+    } catch (error) {
+        isLoading.value = false;
+        console.error('Error creating schedule document:', error);
+    }
 };
 
 // Show Employee Schedule Dialog
