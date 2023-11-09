@@ -152,6 +152,7 @@ const isLoading = ref(false);
 let selectedSchedule = ref(); // To store the selected value
 
 const fetchSchedulesID = async () => {
+	isLoading.value = true;
 	const querySnap = await getDocs(query(collection(db, 'Schedules')));
 
 	// Clear the schedules array before populating it
@@ -161,9 +162,11 @@ const fetchSchedulesID = async () => {
 	querySnap.forEach((doc) => {
 		schedulesID.value.push(doc.id);
 	});
+	isLoading.value = false;
 };
 
 const fetchSchedules = async () => {
+	isLoading.value = true;
 	const docRef = doc(db, 'Schedules', selectedSchedule.value);
 	const docSnap = await getDoc(docRef);
 
@@ -173,12 +176,16 @@ const fetchSchedules = async () => {
 			docSnap.data().createdAt.toDate()
 		).toLocaleString();
 		// Schedules
-		schedules.value = docSnap.data().scheduleData.filter((schedule) => schedule.employeeName === user.displayName);
-
+		schedules.value = docSnap
+			.data()
+			.scheduleData.filter(
+				(schedule) => schedule.employeeName === user.displayName
+			);
 	} else {
 		// docSnap.data() will be undefined in this case
 		console.log('No such document!');
 	}
+	isLoading.value = false;
 };
 
 // Function to generate an array of formatted date strings for 7 previous days before the end date
