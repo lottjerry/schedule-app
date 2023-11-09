@@ -69,7 +69,7 @@
 				</v-table>
 			</v-row>
 
-			<!-- ******* SCHEDULES VIEW MOBILE DEVICES ******* 
+			<!-- ******* SCHEDULES VIEW MOBILE DEVICES ******* -->
 			<v-row v-if="selectedSchedule" class="hidden-md-and-up">
 				<v-col
 					><v-card
@@ -123,7 +123,7 @@
 					</v-card></v-col
 				>
 			</v-row>
-			-->
+			
 		</v-container>
 	</div>
 </template>

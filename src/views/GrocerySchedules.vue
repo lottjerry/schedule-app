@@ -70,7 +70,7 @@
 				</v-table>
 			</v-row>
 
-			<!-- ******* SCHEDULES VIEW MOBILE DEVICES ******* 
+			<!-- ******* SCHEDULES VIEW MOBILE DEVICES ******* -->
 			<v-row v-if="selectedSchedule" class="hidden-md-and-up">
 				<v-col
 					><v-card
@@ -93,6 +93,7 @@
 							>
 								<v-container>
 									<v-row class="justify-center">
+										<v-col cols="5" class="text-caption align-self-center">{{ schedule.employeeName }}</v-col>
 										<div
 											class="text-caption"
 											v-for="employeeSchedule in schedule.schedule"
@@ -124,7 +125,7 @@
 					</v-card></v-col
 				>
 			</v-row>
-			-->
+			
 		</v-container>
 	</div>
 </template>
